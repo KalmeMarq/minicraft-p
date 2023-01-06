@@ -403,20 +403,19 @@ public class Renderer {
         }
     }
 
-    public static int blendRGBAColor(int color1, int color2) {
-        int r1 = color1 >> 16 & 0xFF;
-        int g1 = color1 >> 8 & 0xFF;
-        int b1 = color1 & 0xFF;
-        int a1 = color1 >> 24 & 0xFF;
+    // public static int blendRGBAColor(int color1, int color2) {
+    //     int r1 = color1 >> 16 & 0xFF;
+    //     int g1 = color1 >> 8 & 0xFF;
+    //     int b1 = color1 & 0xFF;
+    //     int a1 = color1 >> 24 & 0xFF;
 
-        int r2 = color2 >> 16 & 0xFF;
-        int g2 = color2 >> 8 & 0xFF;
-        int b2 = color2 & 0xFF;
-        int a2 = color2 >> 24 & 0xFF;
+    //     int r2 = color2 >> 16 & 0xFF;
+    //     int g2 = color2 >> 8 & 0xFF;
+    //     int b2 = color2 & 0xFF;
+    //     int a2 = color2 >> 24 & 0xFF;
 
-        // finish this shit
-        return 0;
-    }
+    //     return 0;
+    // }
 
     // Use a global texture. I set the texture so I don't have to pass it to every render method
 
@@ -529,13 +528,13 @@ public class Renderer {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
             if (scissor && (xx < scissorBox[0] || xx >= scissorBox[2])) continue;   
         
-            for (int yy = y, ys = 0; yy < y + height; yy++, ys++) {
+            for (int yy = y, ys = v; yy < y + height; yy++, ys++) {
                 if (yy < 0 || yy >= Renderer.HEIGHT) continue;
                 if (scissor && (yy < scissorBox[1] || yy >= scissorBox[3])) continue;
                 
                 int pIdx = yy * Renderer.WIDTH + xx;
             
-                int[] colors = { gtexture.getPixels()[ys * gtexture.getWidth() + xs] };
+                int[] colors = { gtexture.getPixels()[ys * gtexture.getWidth() + xs], pixels[pIdx] };
 
                 if (depthTest) {
                     testDepth(pIdx, colors, z);

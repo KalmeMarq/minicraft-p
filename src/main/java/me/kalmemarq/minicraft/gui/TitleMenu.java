@@ -52,6 +52,12 @@ public class TitleMenu extends Menu {
         Renderer.enableBlend();
         Renderer.defaultBlendFunc();
         // Renderer.fill(255 << 24 | 255 << 16 | 0 << 8 | 255);
+
+        // Renderer.enableTexture();
+        // Renderer.setGTexture(Renderer.getImage("title.png"));
+        // Renderer.renderTexturedQuad(0, 0, 120, 16);
+        // Renderer.renderTexturedQuad(120, 30, 120, 16);
+        // Renderer.disableTexture();
         Renderer.render("title.png", Renderer.WIDTH / 2 - 60, 30);
         // Renderer.enableDepthTest();
         
