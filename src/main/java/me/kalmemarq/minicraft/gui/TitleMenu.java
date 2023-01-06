@@ -49,8 +49,8 @@ public class TitleMenu extends Menu {
 
         // Renderer.enableScissor();
         // Renderer.scissor(0, 0, Renderer.WIDTH / 2, 42);
-        Renderer.enableBlend();
-        Renderer.defaultBlendFunc();
+//        Renderer.enableBlend();
+//        Renderer.defaultBlendFunc();
         // Renderer.fill(255 << 24 | 255 << 16 | 0 << 8 | 255);
 
         // Renderer.enableTexture();
@@ -60,6 +60,7 @@ public class TitleMenu extends Menu {
         // Renderer.disableTexture();
         Renderer.render("title.png", Renderer.WIDTH / 2 - 60, 30);
         // Renderer.enableDepthTest();
+//        Renderer.renderGradientQuad(20, 20, 0, 120, 100, 0xFF_FF_00_FF, 0xFF_00_00_FF);
         
         // Renderer.renderColoredQuad(0, 0, 20, 20, 0xFF_FF_00_00);
         
@@ -69,7 +70,7 @@ public class TitleMenu extends Menu {
         
         // Renderer.disableDepthTest();
 
-        Renderer.disableBlend();
+//        Renderer.disableBlend();
         // Renderer.disableScissor();
 
         this.font.render("Version 1.0.0", 1, 1, 0x555555);

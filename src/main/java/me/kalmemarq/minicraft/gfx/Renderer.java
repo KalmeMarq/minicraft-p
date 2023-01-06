@@ -7,13 +7,12 @@ import java.util.Stack;
 
 import org.jetbrains.annotations.Nullable;
 
+import me.kalmemarq.minicraft.util.AABB;
 import me.kalmemarq.minicraft.util.MathHelper;
 
 public class Renderer {
     public static final int WIDTH = 320;
     public static final int HEIGHT = 194;
-
-    private static Renderer INSTANCE;
 
     public static int[] zbuffer = new int[WIDTH * HEIGHT];
     public static int[] pixels = new int[WIDTH * HEIGHT];
@@ -58,8 +57,8 @@ public class Renderer {
     }
 
     public static void fillRect(int x, int y, int width, int height, int color) {
-        int xt = x - Renderer.camera.getTx();
-        int yt = y - Renderer.camera.getTy();
+        int xt = x - Renderer.camera.tx();
+        int yt = y - Renderer.camera.ty();
 
         for (int xx = xt; xx < xt + width; xx++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
@@ -77,8 +76,8 @@ public class Renderer {
     }
 
     public static void render(MinicraftImage image, int x, int y) {
-        int xt = x - Renderer.camera.getTx();
-        int yt = y - Renderer.camera.getTy();
+        int xt = x - Renderer.camera.tx();
+        int yt = y - Renderer.camera.ty();
 
         for (int xx = xt, xs = 0; xx < xt + image.getWidth(); xx++, xs++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
@@ -112,8 +111,8 @@ public class Renderer {
     }
 
     public static void render(MinicraftImage image, int x, int y, int u, int v, int us, int vs, int color) {
-        int xt = x - Renderer.camera.getTx();
-        int yt = y - Renderer.camera.getTy();
+        int xt = x - Renderer.camera.tx();
+        int yt = y - Renderer.camera.ty();
 
         for (int xx = xt, xs = u; xx < xt + us; xx++, xs++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
@@ -133,7 +132,7 @@ public class Renderer {
     private static int tint(int color1, int color2) {
         int r1 = color1 >> 16 & 0xFF;
         int g1 = color1 >> 8 & 0xFF;
-        int b1 = color1 >> 0 & 0xFF;
+        int b1 = color1 & 0xFF;
 
         if (r1 == 0xFF && g1 == 0xFF && b1 == 0xFF) {
             return color2;
@@ -143,8 +142,8 @@ public class Renderer {
     }
 
     public static void render(MinicraftImage image, int x, int y, int u, int v, int us, int vs) {
-        int xt = x - Renderer.camera.getTx();
-        int yt = y - Renderer.camera.getTy();
+        int xt = x - Renderer.camera.tx();
+        int yt = y - Renderer.camera.ty();
 
         for (int xx = xt, xs = u; xx < xt + us; xx++, xs++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
@@ -162,8 +161,8 @@ public class Renderer {
     }
 
     public static void renderPanel(int x, int y, int width, int height) {
-        int xt = x - Renderer.camera.getTx();
-        int yt = y - Renderer.camera.getTy();
+        int xt = x - Renderer.camera.tx();
+        int yt = y - Renderer.camera.ty();
 
         MinicraftImage image = getImage("hud.png");
 
@@ -209,12 +208,17 @@ public class Renderer {
 
     public static void clear() {
         Arrays.fill(Renderer.zbuffer, 0);
-        Arrays.fill(Renderer.pixels, 255 << 24 | 0 << 16 | 0 << 8 | 0);
+        Arrays.fill(Renderer.pixels, 0);
         // resetG();
     }
 
-    public static Renderer getInstance() {
-        return INSTANCE;
+    public static AABB getAABB() {
+        return new AABB(
+            Renderer.camera.tx(),
+            Renderer.camera.ty(),
+            Renderer.camera.tx() + Renderer.WIDTH,
+            Renderer.camera.ty() + Renderer.HEIGHT
+        );
     }
 
     // Test
@@ -229,7 +233,7 @@ public class Renderer {
     private static BlendFactor dstRGBFactor = BlendFactor.ONE_MINUS_SRC_ALPHA;
     private static BlendFactor srcAlphaFactor = BlendFactor.SRC_ALPHA;
     private static BlendFactor dstAlphaFactor = BlendFactor.ONE_MINUS_SRC_ALPHA;
-    // private static float[] blendColor = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
+    private static final float[] blendColor = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
 
     public static void enableBlend() {
         blend = true;
@@ -243,12 +247,12 @@ public class Renderer {
         blendFuncSeparate(BlendFactor.SRC_ALPHA, BlendFactor.ONE_MINUS_SRC_ALPHA, BlendFactor.ONE, BlendFactor.ZERO);
     }
 
-    // public static void blendColor(float r, float g, float b, float a) {
-    //     blendColor[0] = r;
-    //     blendColor[1] = g;
-    //     blendColor[2] = b;
-    //     blendColor[3] = a;
-    // }
+     public static void blendColor(float r, float g, float b, float a) {
+         blendColor[0] = r;
+         blendColor[1] = g;
+         blendColor[2] = b;
+         blendColor[3] = a;
+     }
 
     public static void blendEquation(BlendEquation equation) {
         blendEquation = equation;
@@ -436,7 +440,7 @@ public class Renderer {
     }
 
     private static boolean scissor = false;
-    private static int[] scissorBox = new int[] {0, 0, WIDTH, HEIGHT};
+    private static final int[] scissorBox = new int[] {0, 0, WIDTH, HEIGHT};
 
     public static void enableScissor() {
         scissor = true;
@@ -478,11 +482,71 @@ public class Renderer {
         }
     }
 
+    private static int lerpColor(int color1, int color2, float k) {
+        var bk = (1 - k);
+
+        int r1 = color1 >> 16 & 0xFF;
+        int g1 = color1 >> 8 & 0xFF;
+        int b1 = color1 & 0xFF;
+        int a1 = color1 >> 24 & 0xFF;
+
+        int r2 = color2 >> 16 & 0xFF;
+        int g2 = color2 >> 8 & 0xFF;
+        int b2 = color2 & 0xFF;
+        int a2 = color2 >> 24 & 0xFF;
+
+        float a = a1 * bk + a2 * k;
+        float r = r1 * bk + r2 * k;
+        float g = g1 * bk + g2 * k;
+        float b = b1 * bk + b2 * k;
+
+        return (int)a << 24 | (int)r << 16 | (int)g << 8 | (int)b;
+    }
+
+    public static void renderGradientQuad(int x, int y, int width, int height, int color1, int color2) {
+        renderGradientQuad(x, y, 0, width, height, color1, color2);
+    }
+
+    public static void renderGradientQuad(int x, int y, int z, int width, int height, int color1, int color2) {
+        x -= Renderer.camera.tx();
+        y -= Renderer.camera.ty();
+
+        for (int xx = x; xx < x + width; xx++) {
+            if (xx < 0 || xx >= Renderer.WIDTH) continue;
+            if (scissor && (xx < scissorBox[0] || xx >= scissorBox[2])) continue;
+
+            float k = (float)(xx) / (float)(x + width - 1);
+
+            for (int yy = y; yy < y + height; yy++) {
+                if (yy < 0 || yy >= Renderer.HEIGHT) continue;
+                if (scissor && (yy < scissorBox[1] || yy >= scissorBox[3])) continue;
+
+                int pIdx = yy * Renderer.WIDTH + xx;
+
+                int[] colors = { lerpColor(color1, color2, k), pixels[pIdx] };
+
+                if (depthTest) {
+                    testDepth(pIdx, colors, z);
+                }
+
+                if (blend) pixels[pIdx] = blendEquation.calc(colors[0], colors[1], srcRGBFactor, dstRGBFactor, srcAlphaFactor, dstAlphaFactor);
+                else {
+                    if ((colors[0] >> 24 & 0xFF) != 0) { // Discard color if alpha == 0
+                        pixels[pIdx] = colors[0];
+                    }
+                }
+            }
+        }
+    }
+
     public static void renderColoredQuad(int x, int y, int width, int height, int color) {
         renderColoredQuad(x, y, 0, width, height, color);
     }
 
     public static void renderColoredQuad(int x, int y, int z, int width, int height, int color) {
+        x -= Renderer.camera.tx();
+        y -= Renderer.camera.ty();
+
         for (int xx = x; xx < x + width; xx++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
             if (scissor && (xx < scissorBox[0] || xx >= scissorBox[2])) continue;   
@@ -524,6 +588,9 @@ public class Renderer {
     public static void renderTexturedQuad(int x, int y, int z, int width, int height, int u, int v, int regionWidth, int regionHeight) {
         if (!texture || gtexture == null) return;
 
+        x -= Renderer.camera.tx();
+        y -= Renderer.camera.ty();
+
         for (int xx = x, xs = u; xx < x + width; xx++, xs++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
             if (scissor && (xx < scissorBox[0] || xx >= scissorBox[2])) continue;   
@@ -564,6 +631,9 @@ public class Renderer {
 
     public static void renderTexturedQuad(MinicraftImage image, int x, int y, int z, int width, int height, int u, int v, int regionWidth, int regionHeight) {
         if (image == null) return;
+
+        x -= Renderer.camera.tx();
+        y -= Renderer.camera.ty();
 
         for (int xx = x, xs = u; xx < x + width; xx++, xs++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;

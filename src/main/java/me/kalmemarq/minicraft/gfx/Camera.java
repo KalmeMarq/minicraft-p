@@ -11,11 +11,11 @@ public class Camera {
         this.ty = MathHelper.clamp(y - (Renderer.HEIGHT / 2), minY, maxY - Renderer.HEIGHT);
     }
 
-    public int getTx() {
+    public int tx() {
         return tx;
     }
 
-    public int getTy() {
+    public int ty() {
         return ty;
     }
 }

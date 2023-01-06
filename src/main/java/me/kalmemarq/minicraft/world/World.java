@@ -10,7 +10,7 @@ public class World {
         this.properties = properties;
 
         for (int i = 0; i < this.levels.length; i++) {
-            this.levels[i] = new Level(this, 16, 16);
+            this.levels[i] = new Level(this, 128, 128);
         }
     }
 
