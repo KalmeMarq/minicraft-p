@@ -5,30 +5,30 @@ import java.awt.event.KeyListener;
 
 import me.kalmemarq.minicraft.Minicraft;
 
-public class KeyboardHandler {
+public class Keyboard {
     private final Minicraft mc;
     private final KeyListener listener;
     private final int[] keys = new int[65556];
 
-    public KeyboardHandler(Minicraft mc) {
+    public Keyboard(Minicraft mc) {
         this.mc = mc;
 
         this.listener = new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
-                KeyboardHandler.this.onCharTyped(e.getKeyChar());
+                Keyboard.this.onCharTyped(e.getKeyChar());
             }
 
             @Override
             public void keyPressed(KeyEvent e) {
-                KeyboardHandler.this.keys[e.getKeyCode()] = 1;
-                KeyboardHandler.this.onKey(e.getKeyCode(), 1);
+                Keyboard.this.keys[e.getKeyCode()] = 1;
+                Keyboard.this.onKey(e.getKeyCode(), 1);
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                KeyboardHandler.this.keys[e.getKeyCode()] = 0;
-                KeyboardHandler.this.onKey(e.getKeyCode(), 0);
+                Keyboard.this.keys[e.getKeyCode()] = 0;
+                Keyboard.this.onKey(e.getKeyCode(), 0);
             }
         };
     }
@@ -41,6 +41,10 @@ public class KeyboardHandler {
         if (action == 1) {
             if (Keybinding.FULLSCREEN.test(code)) {
                 mc.getWindow().toggleFullscreen();
+            }
+
+            if (code == Keys.KEY_F5) {
+                this.mc.requestSyncReload();
             }
         }
 

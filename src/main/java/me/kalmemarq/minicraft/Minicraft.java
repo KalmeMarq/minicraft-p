@@ -1,5 +1,7 @@
 package me.kalmemarq.minicraft;
 
+import me.kalmemarq.minicraft.gfx.MinicraftImage;
+import me.kalmemarq.minicraft.util.syncloader.SyncResourceReloader;
 import org.jetbrains.annotations.Nullable;
 
 import me.kalmemarq.minicraft.gfx.Font;
@@ -7,7 +9,7 @@ import me.kalmemarq.minicraft.gfx.Renderer;
 import me.kalmemarq.minicraft.gui.Menu;
 import me.kalmemarq.minicraft.gui.TitleMenu;
 import me.kalmemarq.minicraft.main.RunArgs;
-import me.kalmemarq.minicraft.util.KeyboardHandler;
+import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.Sound;
 import me.kalmemarq.minicraft.util.Window;
 import me.kalmemarq.minicraft.world.World;
@@ -19,7 +21,7 @@ public class Minicraft {
     private final Window window;
     private boolean running = true;
 
-    public final KeyboardHandler keyboardHandler;
+    public final Keyboard keyboardHandler;
 
     public Font font;
 
@@ -29,19 +31,25 @@ public class Minicraft {
     @Nullable
     public World world;
 
+    private boolean requestReload = false;
+    private boolean reloading = false;
+    @Nullable
+    private SyncResourceReloader syncResourceReloader;
+
     public Minicraft(RunArgs runArgs) {
         INSTANCE = this;
         this.window = new Window("Minicraft P", runArgs.width(), runArgs.height(), "icon32.png", "icon64.png");
-        this.keyboardHandler = new KeyboardHandler(this);
+        this.keyboardHandler = new Keyboard(this);
         this.window.getWindowFrame().addKeyListener(this.keyboardHandler.getListener());
 
         this.font = new Font();
         this.setMenu(new TitleMenu());
+
+        requestSyncReload();
     }
 
     public void run() {
         Renderer.loadImages();
-        Sound.load();
 
         long lastT = System.currentTimeMillis();
         long lastR = System.nanoTime();
@@ -95,7 +103,7 @@ public class Minicraft {
                 lastT += 1000L;
                 currentFPS = frameCounter;
                 
-                System.out.println(String.format("%d FPS %d TPS", currentFPS, ticks));
+                System.out.printf("%d FPS %d TPS\n", currentFPS, ticks);
                 
                 frameCounter = 0;
                 ticks = 0;
@@ -110,12 +118,23 @@ public class Minicraft {
     public void render() {
         Renderer.clear();
 
-        if (this.world != null) {
-            this.world.render();
-        }
+        if (this.reloading || requestReload) {
+            Renderer.fill(0);
+            Renderer.render("title.png", Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 - 16);
 
-        if (this.menu != null) {
-            this.menu.render();
+            if (syncResourceReloader != null) {
+                Renderer.fillRect(Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 + 16, 120, 8, 0xFF_FF_FF_FF);
+                Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 1, Renderer.HEIGHT / 2 + 16 + 1, 120 - 2, 8 - 2, 0xFF_00_00_00);
+                Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 2, Renderer.HEIGHT / 2 + 16 + 2, (int)(120 * syncResourceReloader.getProgress()) - 4, 8 - 4, 0xFF_FF_FF_FF);
+            }
+        } else {
+            if (this.world != null) {
+                this.world.render();
+            }
+
+            if (this.menu != null) {
+                this.menu.render();
+            }
         }
 
         if (!this.window.hasFocus()) {
@@ -123,13 +142,18 @@ public class Minicraft {
         }
 
         this.window.renderFrame();
+
+        if (requestReload && !this.reloading) {
+            requestReload = false;
+            this.syncReloadAssets();
+        }
     }
 
     public void update() {
     }
 
     public void tick() {
-        if (this.menu != null) {
+        if (!this.reloading && this.menu != null) {
             this.menu.tick();
         } else if (this.world != null) {
             this.world.tick();
@@ -146,6 +170,38 @@ public class Minicraft {
         if (this.menu != null) {
             this.menu.init(this);
         }
+    }
+
+    public void requestSyncReload() {
+        requestReload = true;
+    }
+
+    public void syncReloadAssets() {
+        this.reloading = true;
+
+        // Well... not that syncronous :/
+        syncResourceReloader = new SyncResourceReloader(() -> {
+            this.reloading = false;
+            this.syncResourceReloader = null;
+            this.requestReload = false;
+        }, Sound.getReloader(), () -> {
+            Renderer.images.put("font.png", new MinicraftImage("/font.png"));
+            Renderer.images.put("hud.png", new MinicraftImage("/hud.png"));
+            Renderer.images.put("tiles.png", new MinicraftImage("/tiles.png"));
+            Renderer.images.put("title.png", new MinicraftImage("/title.png"));
+        });
+
+        Thread reloadThread = new Thread(() -> {
+            try {
+                if (syncResourceReloader != null) {
+                    syncResourceReloader.startReload();
+                }
+            } catch (Exception e) {
+                System.out.println("well... fuck");
+            }
+        });
+
+        reloadThread.start();
     }
 
     public void queueQuit() {

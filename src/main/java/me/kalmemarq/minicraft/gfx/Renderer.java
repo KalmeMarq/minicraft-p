@@ -24,9 +24,6 @@ public class Renderer {
 
     public static void loadImages() {
         images.put("title.png", new MinicraftImage("/title.png"));
-        images.put("hud.png", new MinicraftImage("/hud.png"));
-        images.put("font.png", new MinicraftImage("/font.png"));
-        images.put("tiles.png", new MinicraftImage("/tiles.png"));
     }
 
     public static void reset() {

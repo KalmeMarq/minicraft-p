@@ -9,7 +9,7 @@ import me.kalmemarq.minicraft.world.WorldProperties;
 public class TitleMenu extends Menu {
     private int selected = 0;
 
-    private String[] entries = {
+    private final String[] entries = {
         "Play",
 //        "Options",
         "Quit"
@@ -19,14 +19,14 @@ public class TitleMenu extends Menu {
     public void keyPressed(int code) {
         if (code == Keys.KEY_ARROW_DOWN) {
             selected += 1;
-            Sound.SELECT.play();
+            Sound.play(Sound.SELECT);
         
             if (selected >= entries.length) {
                 selected = 0;
             }
         } else if (code == Keys.KEY_ARROW_UP) {
             selected -= 1;
-            Sound.SELECT.play();
+            Sound.play(Sound.SELECT);
         
             if (selected < 0) {
                 selected = entries.length - 1;
@@ -40,7 +40,7 @@ public class TitleMenu extends Menu {
                 this.mc.queueQuit();
             }
 
-            Sound.CONFIRM.play();
+            Sound.play(Sound.CONFIRM);
         }
     }
 
