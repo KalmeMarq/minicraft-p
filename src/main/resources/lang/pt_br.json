@@ -1,0 +1,19 @@
+{
+  "minicraft.menu.go_back": "Voltar Atrás",
+  "minicraft.menu.play": "Jogar",
+  "minicraft.menu.options": "Opções",
+  "minicraft.menu.help": "Ajuda",
+  "minicraft.menu.quit": "Sair",
+  "minicraft.menu.world_name": "Nome",
+  "minicraft.menu.create_world": "Criar Novo Mundo",
+  "minicraft.menu.world_size": "Tamanho do Mundo",
+  "minicraft.menu.world_size.infinite": "Infinito",
+  "minicraft.menu.world_size.small": "Pequeno",
+  "minicraft.menu.world_size.normal": "Normal",
+  "minicraft.menu.world_size.large": "Grande",
+  "minicraft.menu.gamemode": "Mode de Jogo",
+  "minicraft.menu.gamemode.survival": "Subrevivência",
+  "minicraft.menu.gamemode.creative": "Criativo",
+  "minicraft.menu.gamemode.hardcore": "Hardcore",
+  "minicraft.menu.gamemode.score": "Score"
+}

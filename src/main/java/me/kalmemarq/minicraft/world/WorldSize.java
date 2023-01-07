@@ -1,10 +1,10 @@
 package me.kalmemarq.minicraft.world;
 
 public enum WorldSize {
-    INFINITE(-1, "Infinite"),
-    SMALL(128, "Small"),
-    NORMAL(256, "Normal"),
-    LARGE(512, "Large");
+    INFINITE(-1, "minicraft.menu.world_size.infinite"),
+    SMALL(128, "minicraft.menu.world_size.small"),
+    NORMAL(256, "minicraft.menu.world_size.normal"),
+    LARGE(512, "minicraft.menu.world_size.large");
 
     private final int size;
     private final String name;
@@ -16,5 +16,9 @@ public enum WorldSize {
 
     public String getName() {
         return name;
+    }
+
+    public int getSize() {
+      return size;
     }
 }

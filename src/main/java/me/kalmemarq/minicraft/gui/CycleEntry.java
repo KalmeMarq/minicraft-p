@@ -5,6 +5,7 @@ import java.util.List;
 import me.kalmemarq.minicraft.gfx.Font;
 import me.kalmemarq.minicraft.util.Keybinding;
 import me.kalmemarq.minicraft.util.Sound;
+import me.kalmemarq.minicraft.util.language.Language;
 
 public class CycleEntry<T> extends Entry {
     private final String label;
@@ -63,7 +64,7 @@ public class CycleEntry<T> extends Entry {
     }
 
     public String getText() {
-        return this.label + ": " + this.labelGetter.get(this.currentValue);
+        return Language.translate(this.label) + ": " + Language.translate(this.labelGetter.get(this.currentValue));
     }
 
     @FunctionalInterface

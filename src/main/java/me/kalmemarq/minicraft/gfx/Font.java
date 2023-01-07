@@ -1,7 +1,13 @@
 package me.kalmemarq.minicraft.gfx;
 
+import me.kalmemarq.minicraft.util.language.Language;
+
 public class Font {
-    private static final String charInfo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345" + "6789.,!?'\"-+=/\\%()<>:;"; 
+    private static final String charInfo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345"+
+    "6789.,!?'\"-+=/\\%()<>:;^@ÁÉÍÓÚÑ¿¡"+
+    "ÃÊÇÔÕĞÇÜİÖŞÆØÅŰŐ[]#|{}_АБВГДЕЁЖЗ"+
+    "ИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯÀÂÄÈÎÌÏÒ"+
+    "ÙÛÝ*«»£$&€§ªº"; 
     
     public Font() {
     }
@@ -16,7 +22,6 @@ public class Font {
 
     public void render(String text, int x, int y, int color) {
         text = toUpperCase(text);
-
 
         int xx = x;
         for (int i = 0; i < text.length(); i++) {
@@ -45,12 +50,15 @@ public class Font {
     }
 
     private String toUpperCase(String text) {
-        char[] chrs = text.toCharArray();
+        return text.toUpperCase(Language.language.getLocale());
+        // char[] chrs = text.toCharArray();
 
-        for (int i = 0; i < chrs.length; i++) {
-            chrs[i] = Character.toUpperCase(chrs[i]);
-        }
+        // for (int i = 0; i < chrs.length; i++) {
+        //     if (Character.isUpperCase(chrs[i])) {
+        //         chrs[i] = Character.toUpperCase(chrs[i]);
+        //     }
+        // }
 
-        return text.toUpperCase();
+        // return text;
     }
 }

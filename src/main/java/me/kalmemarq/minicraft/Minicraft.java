@@ -11,6 +11,7 @@ import me.kalmemarq.minicraft.main.RunArgs;
 import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.Sound;
 import me.kalmemarq.minicraft.util.Window;
+import me.kalmemarq.minicraft.util.language.Language;
 import me.kalmemarq.minicraft.util.syncloader.SyncResourceReloader;
 import me.kalmemarq.minicraft.world.World;
 
@@ -142,7 +143,7 @@ public class Minicraft {
             }
         }
 
-        if (!this.window.hasFocus()) {
+        if (!this.reloading && !requestReload && !this.window.hasFocus()) {
             Renderer.renderPanel(Renderer.WIDTH / 2 - 64, Renderer.HEIGHT / 2 - 16 - 4, 128, 40);
         }
 
@@ -190,7 +191,7 @@ public class Minicraft {
             this.syncResourceReloader = null;
             this.requestReload = false;
             this.reloadThread = null;
-        }, Sound.getReloader(), () -> {
+        }, Sound.getReloader(), Language.reloader, TitleMenu.splashReloader, () -> {
             Renderer.images.put("font.png", new MinicraftImage("/font.png"));
             Renderer.images.put("hud.png", new MinicraftImage("/hud.png"));
             Renderer.images.put("tiles.png", new MinicraftImage("/tiles.png"));

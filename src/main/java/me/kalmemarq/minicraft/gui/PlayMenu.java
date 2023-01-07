@@ -20,7 +20,7 @@ public class PlayMenu extends Menu {
         entryGap = 6;
         menuAlign = MenuAlign.TOP_LEFT;
 
-        InputEntry nameEntry = new InputEntry("Name");
+        InputEntry nameEntry = new InputEntry("minicraft.menu.world_name");
         addEntry(nameEntry);
 
         nameEntry.setListener(vl -> {
@@ -29,11 +29,11 @@ public class PlayMenu extends Menu {
             }
         });
 
-        addEntry(new CycleEntry<>("GameMode", Arrays.asList(GameMode.values()), GameMode.SURVIVAL, v -> v.getName(), v -> {}));
+        addEntry(new CycleEntry<>("minicraft.menu.gamemode", Arrays.asList(GameMode.values()), GameMode.SURVIVAL, v -> v.getName(), v -> {}));
 
-        addEntry(new CycleEntry<>("World Size", Arrays.asList(WorldSize.values()), WorldSize.SMALL, v -> v.getName(), v -> {}));
+        addEntry(new CycleEntry<>("minicraft.menu.world_size", Arrays.asList(WorldSize.values()), WorldSize.SMALL, v -> v.getName(), v -> {}));
 
-        createWorldEntry = new SelectEntry("Create New World", () -> {
+        createWorldEntry = new SelectEntry("minicraft.menu.create_world", () -> {
             this.mc.world = new World(new WorldProperties(0, 0));
 
             this.mc.setMenu(null);
@@ -41,7 +41,7 @@ public class PlayMenu extends Menu {
         createWorldEntry.setEnabled(false);
         addEntry(createWorldEntry);
 
-        addEntry(new SelectEntry("Go Back", () -> {
+        addEntry(new SelectEntry("minicraft.menu.go_back", () -> {
             this.mc.setMenu(this.parentMenu);
         }), 8, 0);
     }

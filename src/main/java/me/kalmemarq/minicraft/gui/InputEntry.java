@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import me.kalmemarq.minicraft.gfx.Font;
 import me.kalmemarq.minicraft.util.Keys;
 import me.kalmemarq.minicraft.util.MathHelper;
+import me.kalmemarq.minicraft.util.language.Language;
 
 public class InputEntry extends Entry {
     private final String label;
@@ -60,7 +61,7 @@ public class InputEntry extends Entry {
 
     @Override
     public String getText() {
-        return this.label + ": " + this.value;
+        return Language.translate(this.label) + ": " + this.value;
     }
 
     @FunctionalInterface
