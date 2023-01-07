@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import me.kalmemarq.minicraft.Minicraft;
+import me.kalmemarq.minicraft.gui.PauseMenu;
 
 public class Keyboard {
     private final Minicraft mc;
@@ -45,6 +46,11 @@ public class Keyboard {
 
             if (code == Keys.KEY_F5) {
                 this.mc.requestSyncReload();
+            }
+
+            if (code == Keys.KEY_ESCAPE && this.mc.menu == null) {
+                this.mc.setMenu(new PauseMenu());
+                return;
             }
         }
 

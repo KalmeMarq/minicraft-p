@@ -1,7 +1,7 @@
 {
-  "minicraft.menu.go_back": "Voltar Atrás",
+  "minicraft.menu.go_back": "Voltar Atr\u00e1s",
   "minicraft.menu.play": "Jogar",
-  "minicraft.menu.options": "Opções",
+  "minicraft.menu.options": "Op\u00e7\u00f5es",
   "minicraft.menu.help": "Ajuda",
   "minicraft.menu.quit": "Sair",
   "minicraft.menu.world_name": "Nome",
@@ -12,8 +12,10 @@
   "minicraft.menu.world_size.normal": "Normal",
   "minicraft.menu.world_size.large": "Grande",
   "minicraft.menu.gamemode": "Mode de Jogo",
-  "minicraft.menu.gamemode.survival": "Subrevivência",
+  "minicraft.menu.gamemode.survival": "Sobreviv\u00eancia",
   "minicraft.menu.gamemode.creative": "Criativo",
   "minicraft.menu.gamemode.hardcore": "Hardcore",
-  "minicraft.menu.gamemode.score": "Score"
+  "minicraft.menu.gamemode.score": "Score",
+  "minicraft.menu.return_to_game": "Returnar para o jogo",
+  "minicraft.menu.return_to_title": "Returnar para o t\u00edtulo"
 }

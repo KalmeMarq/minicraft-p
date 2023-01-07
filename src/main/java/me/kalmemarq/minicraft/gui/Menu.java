@@ -23,7 +23,7 @@ public class Menu {
     protected final List<MenuElement<?>> entries = new ArrayList<>();
     protected int entryGap = 2;
     protected MenuAlign menuAlign = MenuAlign.CENTER;
-    private int entriesHeight = 0;
+    protected int entriesHeight = 0;
 
     public Menu() {
     }
@@ -50,21 +50,31 @@ public class Menu {
     public <T extends Entry> T addEntry(T entry, int paddingUp, int paddingDown) {
         this.entries.add(new MenuElement<>(entry).padding(paddingUp, paddingDown));
         return entry;
-    } 
+    }
+
+    protected void calcEntriesHeight() {
+        entriesHeight = 0;
+        
+        for (MenuElement<?> el : entries) {
+            entriesHeight += el.getHeight();
+        }
+
+        if (entries.size() > 0) {
+            entriesHeight += (entries.size() - 1) * entryGap;
+        }
+    }
 
     public void render() {
         int y = 20;
 
         if (entriesHeight == 0) {
-            for (MenuElement<?> el : entries) {
-                entriesHeight += el.getHeight();
-            }
+           calcEntriesHeight();
         }
 
         if (menuAlign == MenuAlign.LEFT_MIDDLE || menuAlign == MenuAlign.CENTER) {
-            y = (Renderer.HEIGHT - (entriesHeight + (entries.size() - 1) * entryGap)) / 2;
+            y = (Renderer.HEIGHT - (entriesHeight)) / 2;
         } else if (menuAlign == MenuAlign.BOTTOM_LEFT || menuAlign == MenuAlign.BOTTOM_MIDDLE) {
-            y = (Renderer.HEIGHT - (entriesHeight + (entries.size() - 1) * entryGap));
+            y = (Renderer.HEIGHT - (entriesHeight));
         }
 
         for (int i = 0; i < entries.size(); i++) {
@@ -147,8 +157,8 @@ public class Menu {
 
     public static class MenuElement<T extends Entry> {
         private final T entry;
-        private int paddingUp;
-        private int paddingDown;
+        private int paddingUp = 0;
+        private int paddingDown = 0;
 
         public MenuElement(T entry) {
             this.entry = entry;

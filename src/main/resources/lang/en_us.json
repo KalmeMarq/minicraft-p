@@ -15,5 +15,7 @@
   "minicraft.menu.gamemode.survival": "Survival",
   "minicraft.menu.gamemode.creative": "Creative",
   "minicraft.menu.gamemode.hardcore": "Hardcore",
-  "minicraft.menu.gamemode.score": "Score"
+  "minicraft.menu.gamemode.score": "Score",
+  "minicraft.menu.return_to_game": "Return to Game",
+  "minicraft.menu.return_to_title": "Return to Title"
 }

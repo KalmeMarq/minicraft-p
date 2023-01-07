@@ -16,8 +16,8 @@ import me.kalmemarq.minicraft.util.JsonUtil;
 import me.kalmemarq.minicraft.util.syncloader.ResourceLoader;
 
 public class Language {
-    public static String code = "pt_pt";
-    public static LanguageInfo language = new LanguageInfo("pt_pt", "English", "US");
+    public static String code = "en_us";
+    public static LanguageInfo language = new LanguageInfo("en_us", "English", "US");
     public static final List<LanguageInfo> languages = new ArrayList<>();
     private static final Map<String, String> translations = Maps.newHashMap();
 

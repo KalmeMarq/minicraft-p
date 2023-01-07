@@ -136,6 +136,13 @@ public class Minicraft {
         } else {
             if (this.world != null) {
                 this.world.render();
+
+                Renderer.enableBlend();
+                Renderer.defaultBlendFunc();
+
+                Renderer.renderColoredQuad(1, Renderer.HEIGHT - 12, Renderer.WIDTH - 2, 10, 0x99_000000);
+
+                Renderer.disableBlend();
             }
 
             if (this.menu != null) {

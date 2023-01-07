@@ -12,8 +12,10 @@
   "minicraft.menu.world_size.normal": "Normal",
   "minicraft.menu.world_size.large": "Grande",
   "minicraft.menu.gamemode": "Mode de Jogo",
-  "minicraft.menu.gamemode.survival": "Subreviv\u00eancia",
+  "minicraft.menu.gamemode.survival": "Sobreviv\u00eancia",
   "minicraft.menu.gamemode.creative": "Criativo",
   "minicraft.menu.gamemode.hardcore": "Hardcore",
-  "minicraft.menu.gamemode.score": "Score"
+  "minicraft.menu.gamemode.score": "Score",
+  "minicraft.menu.return_to_game": "Voltar para o jogo",
+  "minicraft.menu.return_to_title": "Voltar para o t\u00edtulo"
 }
