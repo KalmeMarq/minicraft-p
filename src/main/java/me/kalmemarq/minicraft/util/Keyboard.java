@@ -54,6 +54,9 @@ public class Keyboard {
     }
     
     private void onCharTyped(char chr) {
+        if (this.mc.menu != null) {
+            this.mc.menu.charTyped(chr);
+        }
     }
 
     public KeyListener getListener() {

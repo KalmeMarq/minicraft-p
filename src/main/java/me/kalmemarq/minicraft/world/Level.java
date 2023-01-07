@@ -41,11 +41,11 @@ public class Level {
     // TODO: Optimize this shit
     public void render() {
         AABB frustum = Renderer.getAABB();
-        
+
         int tx0 = Level.toTile(frustum.minX()) - 1;
         int ty0 = Level.toTile(frustum.minY()) - 1;
         int tx1 = Level.toTile(frustum.maxX()) + 1;
-        int ty1 = Level.toPixel(frustum.maxY()) + 1;
+        int ty1 = Level.toTile(frustum.maxY()) + 1;
 
         for (int x = tx0; x <= tx1; x++) {
             for (int y = ty0; y <= ty1; y++) {

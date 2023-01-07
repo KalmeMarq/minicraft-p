@@ -5,6 +5,8 @@ public class Keybinding {
     public static final Keybinding MOVE_DOWN = new Keybinding(Keys.KEY_S, Keys.KEY_ARROW_DOWN);
     public static final Keybinding SELECT_UP = new Keybinding(Keys.KEY_S, Keys.KEY_ARROW_DOWN);
     public static final Keybinding SELECT_DOWN = new Keybinding(Keys.KEY_S, Keys.KEY_ARROW_DOWN);
+    public static final Keybinding SELECT_LEFT = new Keybinding(Keys.KEY_A, Keys.KEY_ARROW_LEFT);
+    public static final Keybinding SELECT_RIGHT = new Keybinding(Keys.KEY_D, Keys.KEY_ARROW_RIGHT);
     public static final Keybinding SELECT = new Keybinding(Keys.KEY_ENTER);
     public static final Keybinding EXIT = new Keybinding(Keys.KEY_ESCAPE);
     public static final Keybinding ATTACK = new Keybinding(Keys.KEY_C, Keys.KEY_SPACE, Keys.KEY_ENTER);

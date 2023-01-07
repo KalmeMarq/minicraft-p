@@ -7,8 +7,8 @@ import java.util.List;
 // A Sync reload cuz I'm too stupid to use completablefuture
 public class SyncResourceReloader {
     private float progress;
-    private List<ResourceLoader> loaders;
-    private OnFinish onFinish;
+    private final List<ResourceLoader> loaders;
+    private final OnFinish onFinish;
 
     public SyncResourceReloader(OnFinish onFinish, ResourceLoader... loaders) {
         this.onFinish = onFinish;
@@ -28,7 +28,7 @@ public class SyncResourceReloader {
         }
 
         // it reloads too fast. Suffering from success
-        Thread.sleep(1000);
+        Thread.sleep(500);
 
         onFinish.finish();
     }

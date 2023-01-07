@@ -39,6 +39,11 @@ public class Font {
         return text.length() * 8;
     }
 
+    // hm
+    public static int getWidth(String text) {
+        return text.length() * 8;
+    }
+
     private String toUpperCase(String text) {
         char[] chrs = text.toCharArray();
 

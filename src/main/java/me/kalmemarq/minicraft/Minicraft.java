@@ -1,10 +1,9 @@
 package me.kalmemarq.minicraft;
 
-import me.kalmemarq.minicraft.gfx.MinicraftImage;
-import me.kalmemarq.minicraft.util.syncloader.SyncResourceReloader;
 import org.jetbrains.annotations.Nullable;
 
 import me.kalmemarq.minicraft.gfx.Font;
+import me.kalmemarq.minicraft.gfx.MinicraftImage;
 import me.kalmemarq.minicraft.gfx.Renderer;
 import me.kalmemarq.minicraft.gui.Menu;
 import me.kalmemarq.minicraft.gui.TitleMenu;
@@ -12,6 +11,7 @@ import me.kalmemarq.minicraft.main.RunArgs;
 import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.Sound;
 import me.kalmemarq.minicraft.util.Window;
+import me.kalmemarq.minicraft.util.syncloader.SyncResourceReloader;
 import me.kalmemarq.minicraft.world.World;
 
 public class Minicraft {
@@ -35,6 +35,8 @@ public class Minicraft {
     private boolean reloading = false;
     @Nullable
     private SyncResourceReloader syncResourceReloader;
+    @Nullable
+    private Thread reloadThread;
 
     public Minicraft(RunArgs runArgs) {
         INSTANCE = this;
@@ -112,6 +114,9 @@ public class Minicraft {
     }
 
     public void close() {
+        if (this.reloadThread != null) {
+        }
+
         this.window.close();
     }
 
@@ -184,6 +189,7 @@ public class Minicraft {
             this.reloading = false;
             this.syncResourceReloader = null;
             this.requestReload = false;
+            this.reloadThread = null;
         }, Sound.getReloader(), () -> {
             Renderer.images.put("font.png", new MinicraftImage("/font.png"));
             Renderer.images.put("hud.png", new MinicraftImage("/hud.png"));
@@ -191,7 +197,7 @@ public class Minicraft {
             Renderer.images.put("title.png", new MinicraftImage("/title.png"));
         });
 
-        Thread reloadThread = new Thread(() -> {
+        reloadThread = new Thread(() -> {
             try {
                 if (syncResourceReloader != null) {
                     syncResourceReloader.startReload();
@@ -200,6 +206,8 @@ public class Minicraft {
                 System.out.println("well... fuck");
             }
         });
+
+        reloadThread.setDaemon(true);
 
         reloadThread.start();
     }

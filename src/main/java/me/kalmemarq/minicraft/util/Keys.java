@@ -74,4 +74,6 @@ public class Keys {
     public static final int KEY_ARROW_DOWN = KeyEvent.VK_DOWN;
     public static final int KEY_ARROW_LEFT = KeyEvent.VK_LEFT;
     public static final int KEY_ARROW_RIGHT = KeyEvent.VK_RIGHT;
+    public static final int KEY_DELETE = KeyEvent.VK_DELETE;
+    public static final int KEY_BACKSPACE = KeyEvent.VK_BACK_SPACE;
 }
