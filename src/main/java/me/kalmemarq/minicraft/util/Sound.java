@@ -2,7 +2,13 @@ package me.kalmemarq.minicraft.util;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -12,8 +18,10 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import com.google.common.collect.Maps;
+
 import me.kalmemarq.minicraft.main.Main;
-import me.kalmemarq.minicraft.util.syncloader.ResourceLoader;
+import me.kalmemarq.minicraft.util.loader.ResourceReloader;
+import me.kalmemarq.minicraft.util.loader.SyncResourceReloader;
 
 public class Sound {
     private static final Map<Identifier, Sound> SOUNDS = Maps.newHashMap();
@@ -49,7 +57,7 @@ public class Sound {
     private final AudioFormat format;
     private final byte[] bytes;
 
-    private static final ResourceLoader reloader = new ResourceLoader() {
+    private static final ResourceReloader reloader = new SyncResourceReloader() {
         @Override
         public void reload() {
             SOUNDS.forEach((identifier, sound) -> sound.stop());
@@ -61,7 +69,7 @@ public class Sound {
         }
     };
 
-    public static ResourceLoader getReloader() {
+    public static ResourceReloader getReloader() {
         return reloader;
     }
 

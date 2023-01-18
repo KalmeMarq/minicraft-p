@@ -2,7 +2,7 @@ package me.kalmemarq.minicraft.entity;
 
 import me.kalmemarq.minicraft.util.CollisionBox;
 import me.kalmemarq.minicraft.util.Direction;
-import me.kalmemarq.minicraft.util.Vec2i;
+import me.kalmemarq.minicraft.util.math.Vec2i;
 import me.kalmemarq.minicraft.world.Level;
 import me.kalmemarq.minicraft.world.World;
 

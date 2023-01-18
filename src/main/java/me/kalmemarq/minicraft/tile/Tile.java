@@ -17,6 +17,10 @@ public class Tile {
         this.health = health;
     }
 
+    public TileState getDefaultState() {
+        return new TileState(this);
+    }
+
     public int getLightPower() {
         return 0;
     }

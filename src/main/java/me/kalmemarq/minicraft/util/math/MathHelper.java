@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.util;
+package me.kalmemarq.minicraft.util.math;
 
 public class MathHelper {
     public static int clamp(int value, int min, int max) {

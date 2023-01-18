@@ -49,14 +49,18 @@ public class CycleEntry<T> extends Entry {
         this.onChange.onChanged(value);
     }
 
-    public void keyPressed(int code) {
+    public boolean keyPressed(int code) {
         if (Keybinding.SELECT_LEFT.test(code)) {
             this.cycle(-1);
             Sound.play(Sound.CONFIRM);
+            return true;
         } else if (Keybinding.SELECT_RIGHT.test(code)) {
             this.cycle(1);
             Sound.play(Sound.CONFIRM);
+            return true;
         }
+
+        return false;
     }
 
     public int getWidth() {

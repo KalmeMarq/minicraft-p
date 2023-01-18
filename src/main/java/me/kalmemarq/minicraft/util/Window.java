@@ -136,10 +136,12 @@ public class Window {
         this.frame.pack();
         this.frame.setLocationRelativeTo(null);
 
+        this.canvas.setFocusable(false);
+
+        this.frame.requestFocus();
+
         this.frame.setVisible(true);
         this.canvas.setVisible(true);
-        
-        this.frame.requestFocus();
 
         Renderer.pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
 
@@ -219,7 +221,7 @@ public class Window {
         int rw = (int) (Renderer.WIDTH * scaleFactor);
         int rh = (int) (Renderer.HEIGHT * scaleFactor);
 
-        graphics.setColor(Color.BLUE);
+        graphics.setColor(Color.DARK_GRAY);
         graphics.fillRect(0, 0, this.width, this.height);
         graphics.drawImage(this.image, (this.width - rw) / 2, (this.height - rh) / 2, rw, rh, null);
 

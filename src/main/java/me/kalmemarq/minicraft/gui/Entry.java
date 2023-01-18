@@ -7,10 +7,11 @@ public abstract class Entry {
       this.enabled = enabled;
     }
 
-    abstract public void keyPressed(int code);
+    abstract public boolean keyPressed(int code);
     abstract public int getWidth();
     abstract public String getText();
 
-    public void charTyped(char chr) {
+    public boolean charTyped(char chr) {
+        return false;
     }
 }

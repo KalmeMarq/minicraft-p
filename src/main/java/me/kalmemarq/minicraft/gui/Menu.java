@@ -114,23 +114,23 @@ public class Menu {
     }
 
     public void keyPressed(int code) {
-        if (code == Keys.KEY_ARROW_DOWN) {
+        if (entries.size() > 0 && this.entries.get(selected).getEntry().keyPressed(code)) {
+            return;
+        } else if (Keybinding.SELECT_DOWN.test(code, entries.size() > 0 && this.entries.get(selected).entry instanceof InputEntry ? Keys.KEY_S : 0)) {
             do {
                 cycleSelection(1);
             } while (!entries.get(selected).getEntry().enabled);
 
             Sound.play(Sound.SELECT);
-        } else if (code == Keys.KEY_ARROW_UP) {
+        } else if (Keybinding.SELECT_UP.test(code, entries.size() > 0 && entries.get(selected).entry instanceof InputEntry ? Keys.KEY_W : 0)) {
             do {
                 cycleSelection(-1);
             } while (!entries.get(selected).getEntry().enabled);
 
             Sound.play(Sound.SELECT);
         } else if (Keybinding.EXIT.test(code) && !(this instanceof TitleMenu)) {
+            Sound.play(Sound.CONFIRM);
             this.mc.setMenu(this.parentMenu);
-        } else {
-            if (entries.size() == 0) return;
-            this.entries.get(selected).getEntry().keyPressed(code);
         }
     }
 

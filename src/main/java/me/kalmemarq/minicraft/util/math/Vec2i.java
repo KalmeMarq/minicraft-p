@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.util;
+package me.kalmemarq.minicraft.util.math;
 
 public class Vec2i {
     public static final Vec2i ZERO = new Vec2i(0, 0);

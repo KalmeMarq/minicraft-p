@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.util;
+package me.kalmemarq.minicraft.util.math;
 
 public class AABB {
     private final int minX;

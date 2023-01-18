@@ -7,8 +7,8 @@ import java.util.Stack;
 
 import org.jetbrains.annotations.Nullable;
 
-import me.kalmemarq.minicraft.util.AABB;
-import me.kalmemarq.minicraft.util.MathHelper;
+import me.kalmemarq.minicraft.util.math.AABB;
+import me.kalmemarq.minicraft.util.math.MathHelper;
 
 public class Renderer {
     public static final int WIDTH = 320;

@@ -1,6 +1,6 @@
 package me.kalmemarq.minicraft.gfx;
 
-import me.kalmemarq.minicraft.util.MathHelper;
+import me.kalmemarq.minicraft.util.math.MathHelper;
 
 public class Camera {
     private int tx;
@@ -17,5 +17,13 @@ public class Camera {
 
     public int ty() {
         return ty;
+    }
+
+    public void setTx(int x) {
+        tx = x;
+    }
+
+    public void setTy(int y) {
+        ty = y;
     }
 }

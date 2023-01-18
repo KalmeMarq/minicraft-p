@@ -9,7 +9,7 @@ import me.kalmemarq.minicraft.gui.PauseMenu;
 public class Keyboard {
     private final Minicraft mc;
     private final KeyListener listener;
-    private final int[] keys = new int[65556];
+    private final static int[] keys = new int[65556];
 
     public Keyboard(Minicraft mc) {
         this.mc = mc;
@@ -22,19 +22,19 @@ public class Keyboard {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                Keyboard.this.keys[e.getKeyCode()] = 1;
+                Keyboard.keys[e.getKeyCode()] = 1;
                 Keyboard.this.onKey(e.getKeyCode(), 1);
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                Keyboard.this.keys[e.getKeyCode()] = 0;
+                Keyboard.keys[e.getKeyCode()] = 0;
                 Keyboard.this.onKey(e.getKeyCode(), 0);
             }
         };
     }
 
-    public boolean isKeyPressed(int code) {
+    public static boolean isKeyPressed(int code) {
         return keys[code] == 1;
     }
 
@@ -45,7 +45,7 @@ public class Keyboard {
             }
 
             if (code == Keys.KEY_F5) {
-                this.mc.requestSyncReload();
+                this.mc.reloadResources();
             }
 
             if (code == Keys.KEY_ESCAPE && this.mc.menu == null) {
@@ -56,6 +56,12 @@ public class Keyboard {
 
         if (action == 1 && this.mc.menu != null) {
             this.mc.menu.keyPressed(code);
+        }
+
+        if (this.mc.world != null) {
+            Keybinding.setKeyPressed(code, action == 1);
+            
+            this.mc.world.wtf(code, action);
         }
     }
     

@@ -3,9 +3,11 @@ package me.kalmemarq.minicraft.gui;
 import org.jetbrains.annotations.Nullable;
 
 import me.kalmemarq.minicraft.gfx.Font;
+import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.Keys;
-import me.kalmemarq.minicraft.util.MathHelper;
+import me.kalmemarq.minicraft.util.Sound;
 import me.kalmemarq.minicraft.util.language.Language;
+import me.kalmemarq.minicraft.util.math.MathHelper;
 
 public class InputEntry extends Entry {
     private final String label;
@@ -24,8 +26,21 @@ public class InputEntry extends Entry {
     }
 
     @Override
-    public void keyPressed(int code) {
-        if (code == Keys.KEY_BACKSPACE) {
+    public boolean keyPressed(int code) {
+        if (Keyboard.isKeyPressed(Keys.KEY_CONTROL) && code == Keys.KEY_BACKSPACE) {
+            int s = Keyboard.isKeyPressed(Keys.KEY_SHIFT) ? 0 : this.value.lastIndexOf(' ');
+            if (s < 0) s = 0;
+            
+            this.value = this.value.substring(0, s);
+            
+            if (this.listener != null) {
+                this.listener.onChange(this.value);
+            }
+
+            Sound.play(Sound.SELECT);
+
+            return true;
+        } else if (code == Keys.KEY_BACKSPACE) {
             int s = 0;
             int e = this.value.length() - 1;
             if (e < 0) e = 0;
@@ -34,7 +49,13 @@ public class InputEntry extends Entry {
             if (this.listener != null) {
                 this.listener.onChange(this.value);
             }
+
+            Sound.play(Sound.SELECT);
+
+            return true;
         }
+
+        return false;
     }
 
     public void setMaxLength(int maxLength) {
@@ -47,7 +68,7 @@ public class InputEntry extends Entry {
     }
 
     @Override
-    public void charTyped(char chr) {
+    public boolean charTyped(char chr) {
         if (chr >= '0' && chr <= '9' || chr >= 'A' && chr <= 'Z'  || chr >= 'a' && chr <= 'z' || chr == ' ') {
             if (this.value.length() + 1 <= this.maxLength) {
                 this.value += chr;
@@ -55,8 +76,14 @@ public class InputEntry extends Entry {
                 if (this.listener != null) {
                     this.listener.onChange(this.value);
                 }
+
+                Sound.play(Sound.SELECT);
+
+                return true;
             }
         }
+
+        return false;
     }
 
     @Override

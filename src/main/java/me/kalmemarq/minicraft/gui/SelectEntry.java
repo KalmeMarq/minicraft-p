@@ -22,11 +22,14 @@ public class SelectEntry extends Entry {
         return Language.translate(text);
     }
 
-    public void keyPressed(int code) {
+    public boolean keyPressed(int code) {
         if (enabled && Keybinding.SELECT.test(code)) {
             this.onSelect.act();
             Sound.play(Sound.CONFIRM);
+            return true;
         }
+
+        return false;
     }
 
     public int getWidth() {

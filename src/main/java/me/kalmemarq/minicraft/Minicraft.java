@@ -1,5 +1,11 @@
 package me.kalmemarq.minicraft;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.jetbrains.annotations.Nullable;
 
 import me.kalmemarq.minicraft.gfx.Font;
@@ -12,7 +18,9 @@ import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.Sound;
 import me.kalmemarq.minicraft.util.Window;
 import me.kalmemarq.minicraft.util.language.Language;
-import me.kalmemarq.minicraft.util.syncloader.SyncResourceReloader;
+import me.kalmemarq.minicraft.util.loader.ResourceLoader;
+import me.kalmemarq.minicraft.util.loader.ResourceReloader;
+import me.kalmemarq.minicraft.util.loader.SyncResourceReloader;
 import me.kalmemarq.minicraft.world.World;
 
 public class Minicraft {
@@ -32,12 +40,10 @@ public class Minicraft {
     @Nullable
     public World world;
 
-    private boolean requestReload = false;
     private boolean reloading = false;
     @Nullable
-    private SyncResourceReloader syncResourceReloader;
-    @Nullable
-    private Thread reloadThread;
+    private ResourceLoader resourceReloader = null;
+    private static ExecutorService worker = Executors.newSingleThreadExecutor();
 
     public Minicraft(RunArgs runArgs) {
         INSTANCE = this;
@@ -48,7 +54,7 @@ public class Minicraft {
         this.font = new Font();
         this.setMenu(new TitleMenu());
 
-        requestSyncReload();
+        reloadResources();
     }
 
     public void run() {
@@ -81,11 +87,11 @@ public class Minicraft {
 			unprocessed += (now - lastTick) / nsPerTick; 
 			lastTick = now;
 
-            while (unprocessed >= 1) {
-                ticks++;
-                this.tick();
-                unprocessed--;
-            }
+            this.tick();
+            // while (unprocessed >= 1) {
+            //     ticks++;
+            //     unprocessed--;
+            // }
 
             this.window.setMaxFrameLimit(300);
 
@@ -115,7 +121,17 @@ public class Minicraft {
     }
 
     public void close() {
-        if (this.reloadThread != null) {
+        worker.shutdown();
+        boolean succ;
+        try {
+            succ = worker.awaitTermination(3L, TimeUnit.SECONDS);
+        } catch(Exception e) {
+            e.printStackTrace();
+            succ = false;
+        }
+
+        if (!succ) {
+            worker.shutdownNow();
         }
 
         this.window.close();
@@ -124,14 +140,14 @@ public class Minicraft {
     public void render() {
         Renderer.clear();
 
-        if (this.reloading || requestReload) {
+        if (this.reloading || this.resourceReloader != null) {
             Renderer.fill(0);
             Renderer.render("title.png", Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 - 16);
 
-            if (syncResourceReloader != null) {
+            if (resourceReloader != null) {
                 Renderer.fillRect(Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 + 16, 120, 8, 0xFF_FF_FF_FF);
                 Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 1, Renderer.HEIGHT / 2 + 16 + 1, 120 - 2, 8 - 2, 0xFF_00_00_00);
-                Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 2, Renderer.HEIGHT / 2 + 16 + 2, (int)(120 * syncResourceReloader.getProgress()) - 4, 8 - 4, 0xFF_FF_FF_FF);
+                Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 2, Renderer.HEIGHT / 2 + 16 + 2, (int)(120 * resourceReloader.getProgress()) - 4, 8 - 4, 0xFF_FF_FF_FF);
             }
         } else {
             if (this.world != null) {
@@ -150,25 +166,23 @@ public class Minicraft {
             }
         }
 
-        if (!this.reloading && !requestReload && !this.window.hasFocus()) {
-            Renderer.renderPanel(Renderer.WIDTH / 2 - 64, Renderer.HEIGHT / 2 - 16 - 4, 128, 40);
-        }
+        // if (!this.reloading && !this.window.hasFocus()) {
+        //     Renderer.renderPanel(Renderer.WIDTH / 2 - 68, Renderer.HEIGHT / 2 - 13, 136, 24);
+        //     this.font.renderCentered("Click to Focus!", Renderer.WIDTH / 2 + 1, Renderer.HEIGHT / 2 - 4, (System.currentTimeMillis() / 300) % 2 == 0 ? 0x8F8F8F : 0x9F9F9F);
+        // }
 
         this.window.renderFrame();
-
-        if (requestReload && !this.reloading) {
-            requestReload = false;
-            this.syncReloadAssets();
-        }
     }
 
     public void update() {
     }
 
     public void tick() {
-        if (!this.reloading && this.menu != null) {
+        if (this.menu != null) {
             this.menu.tick();
-        } else if (this.world != null) {
+        }
+        
+        if (this.world != null) {
             this.world.tick();
         }
     }
@@ -185,39 +199,27 @@ public class Minicraft {
         }
     }
 
-    public void requestSyncReload() {
-        requestReload = true;
-    }
-
-    public void syncReloadAssets() {
+    public void reloadResources() {
         this.reloading = true;
 
-        // Well... not that syncronous :/
-        syncResourceReloader = new SyncResourceReloader(() -> {
-            this.reloading = false;
-            this.syncResourceReloader = null;
-            this.requestReload = false;
-            this.reloadThread = null;
-        }, Sound.getReloader(), Language.reloader, TitleMenu.splashReloader, () -> {
-            Renderer.images.put("font.png", new MinicraftImage("/font.png"));
-            Renderer.images.put("hud.png", new MinicraftImage("/hud.png"));
-            Renderer.images.put("tiles.png", new MinicraftImage("/tiles.png"));
-            Renderer.images.put("title.png", new MinicraftImage("/title.png"));
-        });
-
-        reloadThread = new Thread(() -> {
-            try {
-                if (syncResourceReloader != null) {
-                    syncResourceReloader.startReload();
-                }
-            } catch (Exception e) {
-                System.out.println("well... fuck");
+        List<ResourceReloader> list = new ArrayList<>();
+        list.add(Sound.getReloader());
+        list.add(Language.reloader);
+        list.add(new SyncResourceReloader() {
+            @Override
+            protected void reload() {
+                Renderer.images.put("font.png", new MinicraftImage("/font.png"));
+                Renderer.images.put("hud.png", new MinicraftImage("/hud.png"));
+                Renderer.images.put("title.png", new MinicraftImage("/title.png"));
+                Renderer.images.put("tiles.png", new MinicraftImage("/tiles.png"));
             }
         });
-
-        reloadThread.setDaemon(true);
-
-        reloadThread.start();
+        list.add(TitleMenu.splashReloader);
+        resourceReloader = new ResourceLoader(worker, list, () -> {
+            this.reloading = false;
+            this.resourceReloader = null;
+            System.out.println("Finished reloading resources");
+        });
     }
 
     public void queueQuit() {

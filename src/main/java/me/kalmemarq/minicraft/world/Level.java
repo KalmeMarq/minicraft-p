@@ -5,7 +5,8 @@ import java.util.Random;
 import me.kalmemarq.minicraft.gfx.Renderer;
 import me.kalmemarq.minicraft.tile.Tile.TileState;
 import me.kalmemarq.minicraft.tile.Tiles;
-import me.kalmemarq.minicraft.util.AABB;
+import me.kalmemarq.minicraft.util.NoiseGenerator;
+import me.kalmemarq.minicraft.util.math.AABB;
 
 public class Level {
     private final Random random = new Random();
@@ -25,13 +26,42 @@ public class Level {
         this.width = width;
         this.height = height;
 
-        for (int i = 0; i < tiles.length; i++) {
-            if (this.random.nextInt(10) < 2) {
-                this.tiles[i] = new TileState(Tiles.SAND);
-            } else {
-                this.tiles[i] = new TileState(Tiles.GRASS);
+        NoiseGenerator gen = new NoiseGenerator();
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                double s = gen.noise(x, y);
+
+                if (s < -0.3) {
+                    this.setTileState(x, y, Tiles.WATER.getDefaultState());
+                } else if (s < -0.1) {
+                    this.setTileState(x, y, Tiles.SAND.getDefaultState());
+                } else if (s < 0.3) {
+                    this.setTileState(x, y, Tiles.GRASS.getDefaultState());
+                } else {
+                    this.setTileState(x, y, Tiles.ROCK.getDefaultState());
+                }
             }
         }
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (this.getTileState(x, y).getTile() == Tiles.GRASS && random.nextInt(7) == 4) {
+                    this.setTileState(x, y, Tiles.FLOWER.getDefaultState());
+                } else if (this.getTileState(x, y).getTile() == Tiles.SAND && random.nextInt(7) == 4) {
+                    this.setTileState(x, y, Tiles.CACTUS.getDefaultState());
+                }
+            }
+        }
+    }
+
+    public void setTileState(int x, int y, TileState state) {
+        this.tiles[y * width + x] = state;
+    }
+
+    public TileState getTileState(int x, int y) {
+        TileState state = this.tiles[y * width + x];
+        return state == null ? new TileState(Tiles.AIR) : state;
     }
 
     public boolean inBounds(int x, int y) {
