@@ -2,10 +2,11 @@ package me.kalmemarq.minicraft.gui;
 
 import java.util.List;
 
+import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.gfx.Font;
 import me.kalmemarq.minicraft.util.Keybinding;
-import me.kalmemarq.minicraft.util.Sound;
 import me.kalmemarq.minicraft.util.language.Language;
+import me.kalmemarq.minicraft.util.sound.SoundEvents;
 
 public class CycleEntry<T> extends Entry {
     private final String label;
@@ -52,11 +53,11 @@ public class CycleEntry<T> extends Entry {
     public boolean keyPressed(int code) {
         if (Keybinding.SELECT_LEFT.test(code)) {
             this.cycle(-1);
-            Sound.play(Sound.CONFIRM);
+            Minicraft.getInstance().soundManager.play(SoundEvents.CONFIRM);
             return true;
         } else if (Keybinding.SELECT_RIGHT.test(code)) {
             this.cycle(1);
-            Sound.play(Sound.CONFIRM);
+            Minicraft.getInstance().soundManager.play(SoundEvents.CONFIRM);
             return true;
         }
 

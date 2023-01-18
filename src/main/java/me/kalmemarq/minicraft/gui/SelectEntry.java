@@ -1,9 +1,10 @@
 package me.kalmemarq.minicraft.gui;
 
+import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.gfx.Font;
 import me.kalmemarq.minicraft.util.Keybinding;
-import me.kalmemarq.minicraft.util.Sound;
 import me.kalmemarq.minicraft.util.language.Language;
+import me.kalmemarq.minicraft.util.sound.SoundEvents;
 
 public class SelectEntry extends Entry {
     private final SelectAction onSelect;
@@ -25,7 +26,7 @@ public class SelectEntry extends Entry {
     public boolean keyPressed(int code) {
         if (enabled && Keybinding.SELECT.test(code)) {
             this.onSelect.act();
-            Sound.play(Sound.CONFIRM);
+            Minicraft.getInstance().soundManager.play(SoundEvents.CONFIRM);
             return true;
         }
 

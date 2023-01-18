@@ -10,7 +10,7 @@ import me.kalmemarq.minicraft.gfx.Font;
 import me.kalmemarq.minicraft.gfx.Renderer;
 import me.kalmemarq.minicraft.util.Keybinding;
 import me.kalmemarq.minicraft.util.Keys;
-import me.kalmemarq.minicraft.util.Sound;
+import me.kalmemarq.minicraft.util.sound.SoundEvents;
 
 public class Menu {
     protected Minicraft mc;
@@ -121,15 +121,15 @@ public class Menu {
                 cycleSelection(1);
             } while (!entries.get(selected).getEntry().enabled);
 
-            Sound.play(Sound.SELECT);
+            this.mc.soundManager.play(SoundEvents.SELECT);
         } else if (Keybinding.SELECT_UP.test(code, entries.size() > 0 && entries.get(selected).entry instanceof InputEntry ? Keys.KEY_W : 0)) {
             do {
                 cycleSelection(-1);
             } while (!entries.get(selected).getEntry().enabled);
 
-            Sound.play(Sound.SELECT);
+            this.mc.soundManager.play(SoundEvents.SELECT);
         } else if (Keybinding.EXIT.test(code) && !(this instanceof TitleMenu)) {
-            Sound.play(Sound.CONFIRM);
+            this.mc.soundManager.play(SoundEvents.CONFIRM);
             this.mc.setMenu(this.parentMenu);
         }
     }

@@ -8,6 +8,10 @@ import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
@@ -15,6 +19,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +29,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.gfx.Renderer;
 
 public class Window {
@@ -135,6 +141,105 @@ public class Window {
         this.frame.add(this.canvas);
         this.frame.pack();
         this.frame.setLocationRelativeTo(null);
+
+        // this.frame.setDropTarget(new DropTarget() {
+        //     @Override
+        //     public synchronized void drop(DropTargetDropEvent evt) {
+        //         super.drop(evt);
+
+        //         try {
+        //             evt.acceptDrop(DnDConstants.ACTION_COPY);
+
+        //             Object droppedFiles = evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+
+        //             if (droppedFiles instanceof List && ((List<?>)droppedFiles).size() >= 1) {
+        //                 for (Object file : (List<?>)droppedFiles) {
+        //                     if (file instanceof File) {
+        //                         System.out.println(((File)file).getName());
+        //                     }
+        //                 }
+        //             }
+
+        //         } catch (Exception e) {
+        //             e.printStackTrace();
+        //         }
+        //         // System.out.println(dtde.getDropAction());
+        //     }
+        // });
+
+        
+
+        // this.frame.setTransferHandler(new TransferHandler() {
+        //     private DataFlavor fileFlavor = DataFlavor.javaFileListFlavor;
+
+        //     @Override
+        //     public int getSourceActions(JComponent c) {
+        //         return COPY_OR_MOVE;
+        //     }
+            
+        //     @Override
+        //     public boolean importData(JComponent comp, Transferable t) {
+        //         System.out.println("bs");
+        //         if (!canImport(t.getTransferDataFlavors())) {
+        //             return false;
+        //         }
+                
+        //         try {
+        //             System.out.println("nop");
+        //             if (hasFileFlavor(t.getTransferDataFlavors())) {
+        //             System.out.println("yes");
+
+        //                 Object droppedFiles = t.getTransferData(DataFlavor.javaFileListFlavor);
+
+        //                 if (droppedFiles instanceof List && ((List<?>)droppedFiles).size() >= 1) {
+        //                     for (Object file : (List<?>)droppedFiles) {
+        //                         if (file instanceof File) {
+        //                             System.out.println(((File)file).getName());
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //             return true;
+        //         } catch(Exception e) {
+        //             e.printStackTrace();
+        //         }
+
+        //         return false;
+        //     }
+
+        //     public boolean canImport(DataFlavor[] flavors) {
+        //         if (hasFileFlavor(flavors)) {
+        //             return true;
+        //         }
+
+        //         return false;
+        //     }
+
+        //     private boolean hasFileFlavor(DataFlavor[] flavors) {
+        //         for (int i = 0; i < flavors.length; i++) {
+        //           if (fileFlavor.equals(flavors[i])) {
+        //             return true;
+        //           }
+        //         }
+        //         return false;
+        //     }
+        // });
+
+        this.frame.setDropTarget(new DropTarget() {
+            @SuppressWarnings("unchecked")
+            public synchronized void drop(DropTargetDropEvent evt) {
+                try {
+                    evt.acceptDrop(DnDConstants.ACTION_COPY);
+                    Object obj = evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+
+                    if (obj instanceof List) {
+                        Minicraft.getInstance().onFileDrop((List<File>)obj);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         this.canvas.setFocusable(false);
 

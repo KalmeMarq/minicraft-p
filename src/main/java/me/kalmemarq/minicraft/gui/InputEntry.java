@@ -2,12 +2,13 @@ package me.kalmemarq.minicraft.gui;
 
 import org.jetbrains.annotations.Nullable;
 
+import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.gfx.Font;
 import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.Keys;
-import me.kalmemarq.minicraft.util.Sound;
 import me.kalmemarq.minicraft.util.language.Language;
 import me.kalmemarq.minicraft.util.math.MathHelper;
+import me.kalmemarq.minicraft.util.sound.SoundEvents;
 
 public class InputEntry extends Entry {
     private final String label;
@@ -37,7 +38,7 @@ public class InputEntry extends Entry {
                 this.listener.onChange(this.value);
             }
 
-            Sound.play(Sound.SELECT);
+            Minicraft.getInstance().soundManager.play(SoundEvents.SELECT);
 
             return true;
         } else if (code == Keys.KEY_BACKSPACE) {
@@ -50,7 +51,7 @@ public class InputEntry extends Entry {
                 this.listener.onChange(this.value);
             }
 
-            Sound.play(Sound.SELECT);
+            Minicraft.getInstance().soundManager.play(SoundEvents.SELECT);
 
             return true;
         }
@@ -77,7 +78,7 @@ public class InputEntry extends Entry {
                     this.listener.onChange(this.value);
                 }
 
-                Sound.play(Sound.SELECT);
+                Minicraft.getInstance().soundManager.play(SoundEvents.SELECT);
 
                 return true;
             }

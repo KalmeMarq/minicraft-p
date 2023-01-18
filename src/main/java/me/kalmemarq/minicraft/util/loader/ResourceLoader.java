@@ -18,8 +18,7 @@ public class ResourceLoader {
         CompletableFuture<?>[] futures = new CompletableFuture[reloaders.size()];
 
         for (int i = 0; i < reloaders.size(); i++) {
-            CompletableFuture<Void> f = reloaders.get(i).reload(executor);
-            f.whenComplete((_a, _b) -> {
+            CompletableFuture<Void> f = reloaders.get(i).reload(executor).whenComplete((_a, _b) -> {
                 this.completed.incrementAndGet();
             });
 
@@ -27,6 +26,11 @@ public class ResourceLoader {
         }
 
         CompletableFuture.allOf(futures).whenComplete((_a, _b) -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             onFinish.finish();
         });
     }

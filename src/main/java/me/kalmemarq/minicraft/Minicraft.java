@@ -1,5 +1,6 @@
 package me.kalmemarq.minicraft;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -15,12 +16,13 @@ import me.kalmemarq.minicraft.gui.Menu;
 import me.kalmemarq.minicraft.gui.TitleMenu;
 import me.kalmemarq.minicraft.main.RunArgs;
 import me.kalmemarq.minicraft.util.Keyboard;
-import me.kalmemarq.minicraft.util.Sound;
+import me.kalmemarq.minicraft.util.SplashManager;
 import me.kalmemarq.minicraft.util.Window;
 import me.kalmemarq.minicraft.util.language.Language;
 import me.kalmemarq.minicraft.util.loader.ResourceLoader;
 import me.kalmemarq.minicraft.util.loader.ResourceReloader;
 import me.kalmemarq.minicraft.util.loader.SyncResourceReloader;
+import me.kalmemarq.minicraft.util.sound.SoundManager;
 import me.kalmemarq.minicraft.world.World;
 
 public class Minicraft {
@@ -31,6 +33,8 @@ public class Minicraft {
     private boolean running = true;
 
     public final Keyboard keyboardHandler;
+
+    public final SoundManager soundManager;
 
     public Font font;
 
@@ -52,9 +56,10 @@ public class Minicraft {
         this.window.getWindowFrame().addKeyListener(this.keyboardHandler.getListener());
 
         this.font = new Font();
+        this.soundManager = new SoundManager();
         this.setMenu(new TitleMenu());
 
-        reloadResources();
+        this.reloadResources();
     }
 
     public void run() {
@@ -134,6 +139,8 @@ public class Minicraft {
             worker.shutdownNow();
         }
 
+        this.soundManager.close();
+
         this.window.close();
     }
 
@@ -164,12 +171,12 @@ public class Minicraft {
             if (this.menu != null) {
                 this.menu.render();
             }
+        
+            if (!this.window.hasFocus()) {
+                Renderer.renderPanel(Renderer.WIDTH / 2 - 68, Renderer.HEIGHT / 2 - 13, 136, 24);
+                this.font.renderCentered("Click to Focus!", Renderer.WIDTH / 2 + 1, Renderer.HEIGHT / 2 - 4, (System.currentTimeMillis() / 300) % 2 == 0 ? 0x8F8F8F : 0x9F9F9F);
+            }
         }
-
-        // if (!this.reloading && !this.window.hasFocus()) {
-        //     Renderer.renderPanel(Renderer.WIDTH / 2 - 68, Renderer.HEIGHT / 2 - 13, 136, 24);
-        //     this.font.renderCentered("Click to Focus!", Renderer.WIDTH / 2 + 1, Renderer.HEIGHT / 2 - 4, (System.currentTimeMillis() / 300) % 2 == 0 ? 0x8F8F8F : 0x9F9F9F);
-        // }
 
         this.window.renderFrame();
     }
@@ -203,7 +210,7 @@ public class Minicraft {
         this.reloading = true;
 
         List<ResourceReloader> list = new ArrayList<>();
-        list.add(Sound.getReloader());
+        list.add(this.soundManager);
         list.add(Language.reloader);
         list.add(new SyncResourceReloader() {
             @Override
@@ -214,13 +221,15 @@ public class Minicraft {
                 Renderer.images.put("tiles.png", new MinicraftImage("/tiles.png"));
             }
         });
-        list.add(TitleMenu.splashReloader);
+        list.add(SplashManager.getReloader());
         resourceReloader = new ResourceLoader(worker, list, () -> {
             this.reloading = false;
             this.resourceReloader = null;
             System.out.println("Finished reloading resources");
         });
     }
+
+    public void onFileDrop(List<File> files) {}
 
     public void queueQuit() {
         this.running = false;

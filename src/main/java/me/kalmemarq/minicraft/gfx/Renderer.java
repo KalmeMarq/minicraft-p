@@ -544,6 +544,8 @@ public class Renderer {
         x -= Renderer.camera.tx();
         y -= Renderer.camera.ty();
 
+        int[] colors = { 0, 0 };
+
         for (int xx = x; xx < x + width; xx++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
             if (scissor && (xx < scissorBox[0] || xx >= scissorBox[2])) continue;   
@@ -554,7 +556,8 @@ public class Renderer {
                 
                 int pIdx = yy * Renderer.WIDTH + xx;
 
-                int[] colors = { color, pixels[pIdx] };
+                colors[0] = color;
+                colors[1] = pixels[pIdx];
 
                 if (depthTest) {
                     testDepth(pIdx, colors, z);
@@ -588,6 +591,8 @@ public class Renderer {
         x -= Renderer.camera.tx();
         y -= Renderer.camera.ty();
 
+        int[] colors = { 0, 0 };
+
         for (int xx = x, xs = u; xx < x + width; xx++, xs++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
             if (scissor && (xx < scissorBox[0] || xx >= scissorBox[2])) continue;   
@@ -598,7 +603,8 @@ public class Renderer {
                 
                 int pIdx = yy * Renderer.WIDTH + xx;
             
-                int[] colors = { gtexture.getPixels()[ys * gtexture.getWidth() + xs], pixels[pIdx] };
+                colors[0] = gtexture.getPixels()[ys * gtexture.getWidth() + xs];
+                colors[1] = pixels[pIdx];
 
                 if (depthTest) {
                     testDepth(pIdx, colors, z);
@@ -632,6 +638,8 @@ public class Renderer {
         x -= Renderer.camera.tx();
         y -= Renderer.camera.ty();
 
+        int[] colors = { 0, 0 };
+
         for (int xx = x, xs = u; xx < x + width; xx++, xs++) {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
             if (scissor && (xx < scissorBox[0] || xx >= scissorBox[2])) continue;   
@@ -642,7 +650,8 @@ public class Renderer {
                 
                 int pIdx = yy * Renderer.WIDTH + xx;
             
-                int[] colors = { image.getPixels()[ys * image.getWidth() + xs] };
+                colors[0] = image.getPixels()[ys * image.getWidth() + xs];
+                colors[1] = pixels[pIdx];
 
                 if (depthTest) {
                     testDepth(pIdx, colors, z);

@@ -1,5 +1,6 @@
 package me.kalmemarq.minicraft.util;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,5 +30,9 @@ public class Registry<T> {
 
     public boolean contains(T value) {
         return this.idToEntry.containsValue(value);
+    }
+
+    public Collection<T> values() {
+        return this.idToEntry.values();
     }
 }
