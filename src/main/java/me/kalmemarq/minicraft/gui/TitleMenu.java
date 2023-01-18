@@ -58,7 +58,7 @@ public class TitleMenu extends Menu {
         this.font.render("Version 1.0.0", 1, 1, 0x555555);
 
         if (splash != null) {
-            int bc = this.ticks / 200 % 2 == 0 ? 5 : 3;
+            int bc = this.ticks / 8 % 2 == 0 ? 5 : 3;
             int r = 50 * bc;
             int g = 50 * bc;
             int b = 25 * bc;

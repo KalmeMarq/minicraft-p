@@ -26,7 +26,7 @@ import me.kalmemarq.minicraft.util.sound.SoundManager;
 import me.kalmemarq.minicraft.world.World;
 
 public class Minicraft {
-    public static final int TPS = 20;
+    public static final int TPS = 30;
     private static Minicraft INSTANCE;
 
     private final Window window;
@@ -71,34 +71,25 @@ public class Minicraft {
 
         int currentFPS = 0;
         int ticks = 0;
-        float tickDelta = 0.0f;
-        float deltaTime = 0.0f;
-        
-        int unprocessed = 0;
         int frameCounter = 0;
-        long lastMS = System.currentTimeMillis();
+        int tickCounter = 0;
+        double unprocessed = 0;
+        double NS_PER_TICK = 1E9D / TPS;
 
+        this.window.setMaxFrameLimit(300);
+        
         while (this.running) {
             long now = System.nanoTime();
 
-            long nowMS = System.currentTimeMillis();
-            deltaTime = (float)(nowMS - lastMS);
-            lastMS = nowMS;
-
-            // System.out.println(deltaTime);
-
-
-            double nsPerTick = 1E9D / TPS;
-			unprocessed += (now - lastTick) / nsPerTick; 
+            unprocessed += (now - lastTick) / NS_PER_TICK;
 			lastTick = now;
 
-            this.tick();
-            // while (unprocessed >= 1) {
-            //     ticks++;
-            //     unprocessed--;
-            // }
+            while (unprocessed >= 1) {
+				tickCounter++;
+				this.tick();
+				unprocessed--;
+			}
 
-            this.window.setMaxFrameLimit(300);
 
             int maxFPS = this.window.getMaxFrameLimit();
             double delta = (now - lastR) / 1.0E9;
@@ -116,11 +107,12 @@ public class Minicraft {
             if (System.currentTimeMillis() - lastT > 1000) {
                 lastT += 1000L;
                 currentFPS = frameCounter;
-                
+                ticks = tickCounter;
+
                 System.out.printf("%d FPS %d TPS\n", currentFPS, ticks);
                 
                 frameCounter = 0;
-                ticks = 0;
+                tickCounter = 0;
             }
         }
     }
