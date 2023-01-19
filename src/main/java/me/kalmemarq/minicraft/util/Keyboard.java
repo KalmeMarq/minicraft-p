@@ -45,7 +45,7 @@ public class Keyboard {
             }
 
             if (code == Keys.KEY_F5) {
-                this.mc.reloadResources();
+                this.mc.reloadResources(isKeyPressed(Keys.KEY_SHIFT));
             }
 
             if (code == Keys.KEY_ESCAPE && this.mc.menu == null) {

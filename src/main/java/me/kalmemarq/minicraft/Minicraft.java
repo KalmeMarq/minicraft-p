@@ -1,14 +1,18 @@
 package me.kalmemarq.minicraft;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +32,7 @@ import me.kalmemarq.minicraft.util.SplashManager;
 import me.kalmemarq.minicraft.util.Window;
 import me.kalmemarq.minicraft.util.language.Language;
 import me.kalmemarq.minicraft.util.resource.ReloadableResourceManager;
+import me.kalmemarq.minicraft.util.resource.Resource;
 import me.kalmemarq.minicraft.util.resource.ResourceManager;
 import me.kalmemarq.minicraft.util.resource.ResourcePackManager;
 import me.kalmemarq.minicraft.util.resource.loader.ResourceLoader;
@@ -107,8 +112,6 @@ public class Minicraft {
                 Set<Identifier> textures = new HashSet<>();
                 
                 manager.getResources(PRELOAD_TEXTURES).forEach(res -> {
-                    System.out.println("sup");
-
                     try (BufferedReader reader = res.getAsReader()) {
                         JsonArray arr = JsonUtil.deserialize(reader, JsonArray.class, true);
 
@@ -128,17 +131,16 @@ public class Minicraft {
                 Renderer.textures.clear();
                 
                 result.forEach(texture -> {
-                    System.out.println(texture);
-                //     Resource res = manager.getResource(texture);
+                    Resource res = manager.getResource(texture);
 
-                //     if (res != null) {
-                //         try(InputStream stream = res.getAsInputStream()) {
-                //             BufferedImage image = ImageIO.read(stream);
-                //             Renderer.textures.put(texture, new MinicraftImage(image));
-                //         } catch (IOException e) {
-                //             e.printStackTrace();
-                //         }
-                //     }
+                    if (res != null) {
+                        try(InputStream stream = res.getAsInputStream()) {
+                            BufferedImage image = ImageIO.read(stream);
+                            Renderer.textures.put(texture, new MinicraftImage(image));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 });
             }
         });
@@ -293,13 +295,10 @@ public class Minicraft {
 
     public void reloadResources(boolean reloadCurrent) {
         if (reloadCurrent) {
-            this.resourceLoader = this.resourceManager.reload(() -> {
-                System.out.println("Finished reloading resources");
-            });
+            this.resourceLoader = this.resourceManager.reload();
         } else {
-            this.resourceLoader = this.resourceManager.reload(this.resourcePackManager.createResourcePacks(), () -> {
-                System.out.println("Finished reloading resources");
-            });
+            this.resourcePackManager.findPacks();
+            this.resourceLoader = this.resourceManager.reload(this.resourcePackManager.createResourcePacks());
         }
     }
 

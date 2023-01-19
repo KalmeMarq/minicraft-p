@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.resource.loader.ResourceLoader;
-import me.kalmemarq.minicraft.util.resource.loader.ResourceLoader.OnFinish;
 import me.kalmemarq.minicraft.util.resource.loader.ResourceReloader;
 import me.kalmemarq.minicraft.util.resource.pack.ResourcePack;
 
@@ -50,26 +49,24 @@ public class ReloadableResourceManager implements ResourceManager, AutoCloseable
     /**
      * Reloads with given resource packs and returns a resource loader.
      * @param packs List of the resource packs to the reloading with
-     * @param onFinish Action to run when the reloading finishes
      * @return {@link ResourceLoader}.
      */
-    public ResourceLoader reload(List<ResourcePack> packs, OnFinish onFinish) {
+    public ResourceLoader reload(List<ResourcePack> packs) {
         this.closePacks();
         this.packs = List.copyOf(packs);
         this.updateNamespaces();
 
-        return new ResourceLoader(Minicraft.WORKER, this, this.reloaders, onFinish);
+        return new ResourceLoader(Minicraft.WORKER, this, this.reloaders, () -> {});
     }
 
     /**
      * Reloads with the current resource packs and returns a resource loader.
-     * @param onFinish Action to run when the reloading finishes
      * @return {@link ResourceLoader}.
      */
-    public ResourceLoader reload(OnFinish onFinish) {
+    public ResourceLoader reload() {
         this.updateNamespaces();
 
-        return new ResourceLoader(Minicraft.WORKER, this, this.reloaders, onFinish);
+        return new ResourceLoader(Minicraft.WORKER, this, this.reloaders, () -> {});
     }
 
     private void closePacks() {

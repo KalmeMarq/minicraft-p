@@ -45,7 +45,7 @@ public class NamespaceResourceManager implements ResourceManager {
     @Override
     public List<Resource> getResources(Identifier id) {
         List<Resource> list = new ArrayList<>();
-        
+
         for (int i = 0; i < this.packs.size(); i++) {
             ResourcePack pack = this.packs.get(i);
 
