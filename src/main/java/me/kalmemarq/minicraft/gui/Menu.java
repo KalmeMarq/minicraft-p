@@ -64,6 +64,8 @@ public class Menu {
         }
     }
 
+    public void update() {}
+
     public void render() {
         int y = 20;
 

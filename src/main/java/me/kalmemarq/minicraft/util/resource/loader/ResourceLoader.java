@@ -1,9 +1,11 @@
-package me.kalmemarq.minicraft.util.loader;
+package me.kalmemarq.minicraft.util.resource.loader;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import me.kalmemarq.minicraft.util.resource.ResourceManager;
 
 public class ResourceLoader {
     private final AtomicInteger completed;
@@ -11,21 +13,21 @@ public class ResourceLoader {
 
     private CompletableFuture<Void> future;
 
-    public ResourceLoader(Executor executor, List<ResourceReloader> reloaders, OnFinish onFinish) {
+    public ResourceLoader(Executor executor, ResourceManager resourceManager, List<ResourceReloader> reloaders, OnFinish onFinish) {
         this.completed = new AtomicInteger();
         this.total = reloaders.size();
 
         CompletableFuture<?>[] futures = new CompletableFuture[reloaders.size()];
 
         for (int i = 0; i < reloaders.size(); i++) {
-            CompletableFuture<Void> f = reloaders.get(i).reload(executor).whenComplete((_a, _b) -> {
+            CompletableFuture<Void> f = reloaders.get(i).reload(executor, resourceManager).whenComplete((_a, _b) -> {
                 this.completed.incrementAndGet();
             });
 
             futures[i] = f;
         }
 
-        CompletableFuture.allOf(futures).whenComplete((_a, _b) -> {
+        this.future = CompletableFuture.allOf(futures).whenComplete((_a, _b) -> {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -41,6 +43,10 @@ public class ResourceLoader {
 
     public float getProgress() {
         return this.completed.get() / (float)this.total;
+    }
+
+    public boolean isCompleted() {
+        return this.future.isDone();
     }
 
     @FunctionalInterface

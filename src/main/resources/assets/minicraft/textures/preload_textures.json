@@ -1,0 +1,11 @@
+/**
+  * Always try to add your textures to this file so they can be preloaded.
+  * Warn: This file should be put in the minicraft namespace in the textures subfolder.
+  */
+[
+  "minicraft:textures/default_font.png",
+  "minicraft:textures/font.png",
+  "minicraft:textures/hud.png",
+  "minicraft:textures/tiles.png",
+  "minicraft:textures/title.png"
+]

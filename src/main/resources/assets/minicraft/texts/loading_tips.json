@@ -1,0 +1,13 @@
+/**
+  * Messages shown when loading worlds
+  *
+  * replace?: boolean - if it should replace the previous loaded (packs below) tips 
+  * loadings_tips: string[] - list of tips (they can be translations)
+  */
+{
+  "loading_tips": [
+    "Did you know that Minicraft is not Minecraft?",
+    "To play the game you have to move your fingers",
+    "If you want kill a mob you have to kill it"
+  ]
+}

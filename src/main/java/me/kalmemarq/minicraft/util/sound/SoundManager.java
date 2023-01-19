@@ -14,7 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
 
-import me.kalmemarq.minicraft.util.loader.SyncResourceReloader;
+import me.kalmemarq.minicraft.util.resource.ResourceManager;
+import me.kalmemarq.minicraft.util.resource.loader.SyncResourceReloader;
 
 public class SoundManager extends SyncResourceReloader implements AutoCloseable {
     private static final int MAX_CLIP_POOL_SIZE = 4;
@@ -110,7 +111,7 @@ public class SoundManager extends SyncResourceReloader implements AutoCloseable 
     }
     
     @Override
-    protected void reload() {
+    protected void reload(ResourceManager manager) {
         stopAll();
         buffers.clear();
 

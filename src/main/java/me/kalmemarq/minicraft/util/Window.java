@@ -21,13 +21,15 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
+
+import org.jetbrains.annotations.Nullable;
 
 import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.gfx.Renderer;
@@ -56,7 +58,7 @@ public class Window {
     private boolean vsync;
     private int maxFrameLimit = 60; 
 
-    public Window(String title, int width, int height, String icon32, String icon64) {
+    public Window(String title, int width, int height) {
         this.width = width;
         this.height = height;
         this.prevWidth = width;
@@ -72,26 +74,6 @@ public class Window {
         this.frame.getContentPane().setPreferredSize(new Dimension(width, height));
         this.frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.frame.setResizable(true);
-        
-        {
-            List<BufferedImage> icons = new ArrayList<>();
-
-            try {
-                BufferedImage icon = ImageIO.read(Objects.requireNonNull(Window.class.getResourceAsStream("/" + icon32)));
-                icons.add(icon);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                BufferedImage icon = ImageIO.read(Objects.requireNonNull(Window.class.getResourceAsStream("/" + icon64)));
-                icons.add(icon);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            this.frame.setIconImages(icons);
-        }
 
         this.frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -174,6 +156,36 @@ public class Window {
             this.x = this.frame.getLocationOnScreen().getX();
             this.y = this.frame.getLocationOnScreen().getY();
         } catch(Exception ignored) {}
+    }
+
+    public void setIcon(@Nullable InputStream icon32, @Nullable InputStream icon64) {
+        List<BufferedImage> icons = new ArrayList<>();
+
+        if (icon32 != null) {
+            try {
+                BufferedImage icon = ImageIO.read(icon32);
+                icons.add(icon);
+                icon32.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("icon32 was not provided");
+        }
+
+        if (icon64 != null) {
+            try {
+                BufferedImage icon = ImageIO.read(icon64);
+                icons.add(icon);
+                icon64.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("icon64 was not provided");
+        }
+
+        this.frame.setIconImages(icons);
     }
 
     public void close() {

@@ -1,0 +1,16 @@
+{
+  "for": ["workbench"],
+  "requires": [
+    {
+      "item": "minicraft:rock",
+      "amount": 2
+    },
+    {
+      "item": "minicraft:stick"
+    }
+  ],
+  "result": {
+    "item": "minicraft:rock_sword",
+    "amount": 1
+  }
+}

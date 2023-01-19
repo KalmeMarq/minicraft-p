@@ -13,8 +13,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import me.kalmemarq.minicraft.util.JsonUtil;
-import me.kalmemarq.minicraft.util.loader.ResourceReloader;
-import me.kalmemarq.minicraft.util.loader.SyncResourceReloader;
+import me.kalmemarq.minicraft.util.resource.ResourceManager;
+import me.kalmemarq.minicraft.util.resource.loader.ResourceReloader;
+import me.kalmemarq.minicraft.util.resource.loader.SyncResourceReloader;
 
 public class Language {
     public static String code = "en_us";
@@ -23,7 +24,8 @@ public class Language {
     private static final Map<String, String> translations = Maps.newHashMap();
 
     public static ResourceReloader reloader = new SyncResourceReloader() {
-        public void reload() {
+        @Override
+        public void reload(ResourceManager manager) {
             translations.clear();
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Language.class.getResourceAsStream("/languages.json")))) {;

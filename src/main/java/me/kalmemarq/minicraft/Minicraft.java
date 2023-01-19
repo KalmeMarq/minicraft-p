@@ -1,13 +1,19 @@
 package me.kalmemarq.minicraft;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.jetbrains.annotations.Nullable;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 import me.kalmemarq.minicraft.gfx.Font;
 import me.kalmemarq.minicraft.gfx.MinicraftImage;
@@ -15,13 +21,20 @@ import me.kalmemarq.minicraft.gfx.Renderer;
 import me.kalmemarq.minicraft.gui.Menu;
 import me.kalmemarq.minicraft.gui.TitleMenu;
 import me.kalmemarq.minicraft.main.RunArgs;
+import me.kalmemarq.minicraft.util.Identifier;
+import me.kalmemarq.minicraft.util.JsonUtil;
 import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.SplashManager;
 import me.kalmemarq.minicraft.util.Window;
 import me.kalmemarq.minicraft.util.language.Language;
-import me.kalmemarq.minicraft.util.loader.ResourceLoader;
-import me.kalmemarq.minicraft.util.loader.ResourceReloader;
-import me.kalmemarq.minicraft.util.loader.SyncResourceReloader;
+import me.kalmemarq.minicraft.util.resource.ReloadableResourceManager;
+import me.kalmemarq.minicraft.util.resource.ResourceManager;
+import me.kalmemarq.minicraft.util.resource.ResourcePackManager;
+import me.kalmemarq.minicraft.util.resource.loader.ResourceLoader;
+import me.kalmemarq.minicraft.util.resource.loader.SyncResourceReloader;
+import me.kalmemarq.minicraft.util.resource.loader.WithPreparationResourceReloader;
+import me.kalmemarq.minicraft.util.resource.pack.VanillaResourcePack;
+import me.kalmemarq.minicraft.util.resource.provider.DefaultResourcePackProvider;
 import me.kalmemarq.minicraft.util.sound.SoundManager;
 import me.kalmemarq.minicraft.world.World;
 
@@ -44,20 +57,91 @@ public class Minicraft {
     @Nullable
     public World world;
 
-    private boolean reloading = false;
+    private final ReloadableResourceManager resourceManager;
+    private final ResourcePackManager resourcePackManager;
+    public final VanillaResourcePack defautResourcePack;
     @Nullable
-    private ResourceLoader resourceReloader = null;
-    private static ExecutorService worker = Executors.newSingleThreadExecutor();
+    private ResourceLoader resourceLoader;
+    public static ExecutorService WORKER = Executors.newSingleThreadExecutor();
 
     public Minicraft(RunArgs runArgs) {
         INSTANCE = this;
-        this.window = new Window("Minicraft P", runArgs.width(), runArgs.height(), "icon32.png", "icon64.png");
+        this.resourcePackManager = new ResourcePackManager();
+        this.defautResourcePack = new VanillaResourcePack();
+
+        this.window = new Window("Minicraft P", runArgs.width(), runArgs.height());
+        
+        this.window.setIcon(
+            this.defautResourcePack.open(new Identifier("icons/icon32.png")),
+            this.defautResourcePack.open(new Identifier("icons/icon64.png"))
+        );
+
         this.keyboardHandler = new Keyboard(this);
         this.window.getWindowFrame().addKeyListener(this.keyboardHandler.getListener());
 
         this.font = new Font();
         this.soundManager = new SoundManager();
         this.setMenu(new TitleMenu());
+
+        this.resourcePackManager.addProvider(new DefaultResourcePackProvider(this.defautResourcePack));
+        this.resourceManager = new ReloadableResourceManager();
+        this.resourceManager.addReloader(this.soundManager);
+        this.resourceManager.addReloader(Font.reloader);
+        this.resourceManager.addReloader(Language.reloader);
+        this.resourceManager.addReloader(SplashManager.getReloader());
+        this.resourceManager.addReloader(new SyncResourceReloader() {
+            @Override
+            protected void reload(ResourceManager manager) {
+                Renderer.images.put("font.png", new MinicraftImage("/font.png"));
+                Renderer.images.put("default_font.png", new MinicraftImage("/default_font.png"));
+                Renderer.images.put("hud.png", new MinicraftImage("/hud.png"));
+                Renderer.images.put("title.png", new MinicraftImage("/title.png"));
+                Renderer.images.put("tiles.png", new MinicraftImage("/tiles.png"));
+            }
+        });
+        this.resourceManager.addReloader(new WithPreparationResourceReloader<Set<Identifier>>() {
+            private static final Identifier PRELOAD_TEXTURES = new Identifier("textures/preload_textures.json");
+       
+            @Override
+            protected Set<Identifier> prepare(ResourceManager manager) {
+                Set<Identifier> textures = new HashSet<>();
+                
+                manager.getResources(PRELOAD_TEXTURES).forEach(res -> {
+                    System.out.println("sup");
+
+                    try (BufferedReader reader = res.getAsReader()) {
+                        JsonArray arr = JsonUtil.deserialize(reader, JsonArray.class, true);
+
+                        for (JsonElement el : arr) {
+                            textures.add(new Identifier(el.getAsString()));
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+                return textures;
+            }
+
+            @Override
+            protected void apply(Set<Identifier> result, ResourceManager manager) {
+                Renderer.textures.clear();
+                
+                result.forEach(texture -> {
+                    System.out.println(texture);
+                //     Resource res = manager.getResource(texture);
+
+                //     if (res != null) {
+                //         try(InputStream stream = res.getAsInputStream()) {
+                //             BufferedImage image = ImageIO.read(stream);
+                //             Renderer.textures.put(texture, new MinicraftImage(image));
+                //         } catch (IOException e) {
+                //             e.printStackTrace();
+                //         }
+                //     }
+                });
+            }
+        });
 
         this.reloadResources();
     }
@@ -77,7 +161,7 @@ public class Minicraft {
         double NS_PER_TICK = 1E9D / TPS;
 
         this.window.setMaxFrameLimit(300);
-        
+
         while (this.running) {
             long now = System.nanoTime();
 
@@ -118,17 +202,17 @@ public class Minicraft {
     }
 
     public void close() {
-        worker.shutdown();
+        WORKER.shutdown();
         boolean succ;
         try {
-            succ = worker.awaitTermination(3L, TimeUnit.SECONDS);
+            succ = WORKER.awaitTermination(3L, TimeUnit.SECONDS);
         } catch(Exception e) {
             e.printStackTrace();
             succ = false;
         }
 
         if (!succ) {
-            worker.shutdownNow();
+            WORKER.shutdownNow();
         }
 
         this.soundManager.close();
@@ -139,14 +223,16 @@ public class Minicraft {
     public void render() {
         Renderer.clear();
 
-        if (this.reloading || this.resourceReloader != null) {
+        if (this.resourceLoader != null) {
             Renderer.fill(0);
             Renderer.render("title.png", Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 - 16);
 
-            if (resourceReloader != null) {
-                Renderer.fillRect(Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 + 16, 120, 8, 0xFF_FF_FF_FF);
-                Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 1, Renderer.HEIGHT / 2 + 16 + 1, 120 - 2, 8 - 2, 0xFF_00_00_00);
-                Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 2, Renderer.HEIGHT / 2 + 16 + 2, (int)(120 * resourceReloader.getProgress()) - 4, 8 - 4, 0xFF_FF_FF_FF);
+            Renderer.fillRect(Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 + 16, 120, 8, 0xFF_FF_FF_FF);
+            Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 1, Renderer.HEIGHT / 2 + 16 + 1, 120 - 2, 8 - 2, 0xFF_00_00_00);
+            Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 2, Renderer.HEIGHT / 2 + 16 + 2, (int)(120 * resourceLoader.getProgress()) - 4, 8 - 4, 0xFF_FF_FF_FF);
+
+            if (this.resourceLoader.isCompleted()) {
+                this.resourceLoader = null;
             }
         } else {
             if (this.world != null) {
@@ -174,6 +260,9 @@ public class Minicraft {
     }
 
     public void update() {
+        if (this.resourceLoader == null && this.menu != null) {
+            this.menu.update();
+        } 
     }
 
     public void tick() {
@@ -199,26 +288,19 @@ public class Minicraft {
     }
 
     public void reloadResources() {
-        this.reloading = true;
+        reloadResources(false);
+    }
 
-        List<ResourceReloader> list = new ArrayList<>();
-        list.add(this.soundManager);
-        list.add(Language.reloader);
-        list.add(new SyncResourceReloader() {
-            @Override
-            protected void reload() {
-                Renderer.images.put("font.png", new MinicraftImage("/font.png"));
-                Renderer.images.put("hud.png", new MinicraftImage("/hud.png"));
-                Renderer.images.put("title.png", new MinicraftImage("/title.png"));
-                Renderer.images.put("tiles.png", new MinicraftImage("/tiles.png"));
-            }
-        });
-        list.add(SplashManager.getReloader());
-        resourceReloader = new ResourceLoader(worker, list, () -> {
-            this.reloading = false;
-            this.resourceReloader = null;
-            System.out.println("Finished reloading resources");
-        });
+    public void reloadResources(boolean reloadCurrent) {
+        if (reloadCurrent) {
+            this.resourceLoader = this.resourceManager.reload(() -> {
+                System.out.println("Finished reloading resources");
+            });
+        } else {
+            this.resourceLoader = this.resourceManager.reload(this.resourcePackManager.createResourcePacks(), () -> {
+                System.out.println("Finished reloading resources");
+            });
+        }
     }
 
     public void onFileDrop(List<File> files) {}

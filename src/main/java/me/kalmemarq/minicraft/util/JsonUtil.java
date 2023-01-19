@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
 
+// Maybe Jackson better
 public class JsonUtil {
     private static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 

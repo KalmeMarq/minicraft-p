@@ -1,0 +1,21 @@
+{
+  "minicraft.menu.go_back": "Go Back",
+  "minicraft.menu.play": "Play",
+  "minicraft.menu.options": "Options",
+  "minicraft.menu.help": "Help",
+  "minicraft.menu.quit": "Quit",
+  "minicraft.menu.world_name": "Name",
+  "minicraft.menu.create_world": "Create New World",
+  "minicraft.menu.world_size": "World Size",
+  "minicraft.menu.world_size.infinite": "Infinite",
+  "minicraft.menu.world_size.small": "Small",
+  "minicraft.menu.world_size.normal": "Normal",
+  "minicraft.menu.world_size.large": "Large",
+  "minicraft.menu.gamemode": "Game Mode",
+  "minicraft.menu.gamemode.survival": "Survival",
+  "minicraft.menu.gamemode.creative": "Creative",
+  "minicraft.menu.gamemode.hardcore": "Hardcore",
+  "minicraft.menu.gamemode.score": "Score",
+  "minicraft.menu.return_to_game": "Return to Game",
+  "minicraft.menu.return_to_title": "Return to Title"
+}

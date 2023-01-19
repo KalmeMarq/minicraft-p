@@ -1,0 +1,17 @@
+/**
+  * { [code: string]: { name: string; region: string } }
+  */
+{
+  "en_us": {
+    "name": "English",
+    "region": "US"
+  },
+  "pt_pt": {
+    "name": "Portuguese",
+    "region": "Portugal"
+  },
+  "pt_br": {
+    "name": "Portuguese",
+    "region": "Brazil"
+  }
+}

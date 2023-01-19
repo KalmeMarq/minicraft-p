@@ -9,6 +9,7 @@ import me.kalmemarq.minicraft.util.SplashManager;
 public class TitleMenu extends Menu {
     @Nullable
     private String splash;
+    private int splashColor;
 
     private int ticks;
 
@@ -48,21 +49,28 @@ public class TitleMenu extends Menu {
     }
 
     @Override
-    public void render() {
-        if (splash == null) {
-            splash = SplashManager.getSplash();
+    public void update() {
+        if (this.splash == null) {
+            this.splash = SplashManager.getSplash();
         }
 
-        Renderer.render("title.png", Renderer.WIDTH / 2 - 60, 30);
-        
-        this.font.render("Version 1.0.0", 1, 1, 0x555555);
-
-        if (splash != null) {
+        if (this.splash != null) {
             int bc = this.ticks / 8 % 2 == 0 ? 5 : 3;
             int r = 50 * bc;
             int g = 50 * bc;
             int b = 25 * bc;
-            this.font.renderCentered(splash, Renderer.WIDTH / 2, 64, r << 16 | g << 8 | b);
+            this.splashColor = r << 16 | g << 8 | b;
+        }
+    }
+
+    @Override
+    public void render() {
+        Renderer.render("title.png", Renderer.WIDTH / 2 - 60, 30);
+
+        this.font.render("Version 1.0.0", 1, 1, 0x555555);
+
+        if (this.splash != null) {
+            this.font.renderCentered(splash, Renderer.WIDTH / 2, 64, this.splashColor);
         }
 
         super.render();

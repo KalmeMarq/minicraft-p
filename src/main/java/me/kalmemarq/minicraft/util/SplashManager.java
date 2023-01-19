@@ -13,8 +13,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import me.kalmemarq.minicraft.util.language.Language;
-import me.kalmemarq.minicraft.util.loader.ResourceReloader;
-import me.kalmemarq.minicraft.util.loader.SyncResourceReloader;
+import me.kalmemarq.minicraft.util.resource.ResourceManager;
+import me.kalmemarq.minicraft.util.resource.loader.ResourceReloader;
+import me.kalmemarq.minicraft.util.resource.loader.SyncResourceReloader;
 
 public class SplashManager {
     private static final Random RANDOM = new Random();
@@ -22,7 +23,7 @@ public class SplashManager {
 
     private static final ResourceReloader reloader = new SyncResourceReloader() {
         @Override
-        protected void reload() {
+        protected void reload(ResourceManager manager) {
             splashes.clear();
     
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Language.class.getResourceAsStream("/splashes.json")))) {;
@@ -56,6 +57,6 @@ public class SplashManager {
             return "Sadge";
         }
 
-		return splashes.get(RANDOM.nextInt(splashes.size()));
+		return splashes.get(RANDOM.nextInt(splashes.size() - 1) + 1);
     }
 }

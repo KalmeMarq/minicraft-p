@@ -1,13 +1,79 @@
 package me.kalmemarq.minicraft.gfx;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import me.kalmemarq.minicraft.util.JsonUtil;
 import me.kalmemarq.minicraft.util.language.Language;
+import me.kalmemarq.minicraft.util.resource.ResourceManager;
+import me.kalmemarq.minicraft.util.resource.loader.ResourceReloader;
+import me.kalmemarq.minicraft.util.resource.loader.SyncResourceReloader;
 
 public class Font {
-    private static final String charInfo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345"+
-    "6789.,!?'\"-+=/\\%()<>:;^@ÁÉÍÓÚÑ¿¡"+
-    "ÃÊÇÔÕĞÇÜİÖŞÆØÅŰŐ[]#|{}_АБВГДЕЁЖЗ"+
-    "ИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯÀÂÄÈÎÌÏÒ"+
-    "ÙÛÝ*«»£$&€§ªº"; 
+    // private static final String charInfo = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345"+
+    // "6789.,!?'\"-+=/\\%()<>:;^@ÁÉÍÓÚÑ¿¡"+
+    // "ÃÊÇÔÕĞÇÜİÖŞÆØÅŰŐ[]#|{}_АБВГДЕЁЖЗ"+
+    // "ИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯÀÂÄÈÎÌÏÒ"+
+    // "ÙÛÝ*«»£$&€§ªº"; 
+
+    static class GlyphInfo {
+        public int u;
+        public int v;
+    }
+
+    private static final Map<Integer, GlyphInfo> glyphInfos = Maps.newHashMap();
+
+    public static final ResourceReloader reloader = new SyncResourceReloader() {
+        @Override
+        protected void reload(ResourceManager manager) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Language.class.getResourceAsStream("/font.json")))) {;
+                JsonObject obj = JsonUtil.deserialize(reader);
+                JsonArray arr = JsonUtil.getArray(obj, "chars");
+    
+                glyphInfos.clear();
+
+                int r = 0;
+                for (JsonElement txt : arr) {
+                    int[] codePoints = txt.getAsString().codePoints().toArray();
+                    
+                    int c = 0;
+                    for (int o : codePoints) {
+                        if (o != 0) {
+                            GlyphInfo info = new GlyphInfo();
+                            info.u = c * 8;
+                            info.v = r * 8; 
+                        
+                            glyphInfos.put(o, info);
+                        }
+
+                        ++c;
+                    }
+
+                    ++r;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            String txt = "IHATEYOUÁ";
+            int[] c = txt.codePoints().toArray();
+
+            for (int cc : c) {
+                GlyphInfo info = glyphInfos.get(cc);
+
+                if (info != null) {
+                    System.out.println(Character.toString(cc) + ": " + info.u + "," + info.v);
+                }
+            }
+
+        }
+    };
     
     public Font() {
     }
@@ -24,16 +90,18 @@ public class Font {
         text = toUpperCase(text);
 
         int xx = x;
-        for (int i = 0; i < text.length(); i++) {
-            char chr = text.charAt(i);
+
+        int[] chrs = text.codePoints().toArray();
+
+        for (int i = 0; i < chrs.length; i++) {
+            int chr = chrs[i];
 
             if (!Character.isWhitespace(chr)) {
-                int ii = charInfo.indexOf(chr);
+                GlyphInfo ii = glyphInfos.get(chr);
 
-                int u = ii % 32;
-                int v = ii / 32;
-
-                Renderer.render("font.png", xx, y, u * 8, v * 8, 8, 8, color);
+                if (ii != null) {
+                    Renderer.render("default_font.png", xx, y, ii.u, ii.v, 8, 8, color);
+                }
             }
 
             xx += 8;
@@ -51,14 +119,5 @@ public class Font {
 
     private String toUpperCase(String text) {
         return text.toUpperCase(Language.language.getLocale());
-        // char[] chrs = text.toCharArray();
-
-        // for (int i = 0; i < chrs.length; i++) {
-        //     if (Character.isUpperCase(chrs[i])) {
-        //         chrs[i] = Character.toUpperCase(chrs[i]);
-        //     }
-        // }
-
-        // return text;
     }
 }

@@ -1,0 +1,21 @@
+/**
+  * Resource Pack Manifest
+  *
+  * pack_format: int
+  * name?: string                  - Display name. If it's not present it will use the resource pack folder/zip name
+  * description?: string           - Description for the resource pack. it's optional but please use it :)
+  * metadata?: {
+  *   authors?: string | string[]  - Authors of the resource pack
+  *   license?: string             - License this resource pack is under
+  *   homepage?: string
+  *   sources?: string
+  * }
+  */
+{
+  "pack_format": 1,
+  "name": "Default",
+  "description": "The default look of Minicraft",
+  "metadata": {
+    "authors": ["Minicraft P"]
+  }
+}

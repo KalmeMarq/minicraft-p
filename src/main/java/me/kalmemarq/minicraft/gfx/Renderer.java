@@ -7,6 +7,7 @@ import java.util.Stack;
 
 import org.jetbrains.annotations.Nullable;
 
+import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.math.AABB;
 import me.kalmemarq.minicraft.util.math.MathHelper;
 
@@ -18,6 +19,7 @@ public class Renderer {
     public static int[] pixels = new int[WIDTH * HEIGHT];
 
     public static final Map<String, MinicraftImage> images = new HashMap<>();
+    public static final Map<Identifier, MinicraftImage> textures = new HashMap<>();
 
     public static final Stack<Camera> cameraStack = new Stack<>();
     public static Camera camera = new Camera();
@@ -269,141 +271,6 @@ public class Renderer {
         dstAlphaFactor = dstAlpha;
     }
 
-    public static class BlendEquation {
-        public static final BlendEquation FUNC_ADD = new BlendEquation((colorSrc, colorDst, srcRGBFactor, dstRGBFactor, srcAlphaFactor, dstAlphaFactor) -> {
-            float sa = (colorSrc >> 24 & 0xFF) / 255.0f;
-            float sr = (colorSrc >> 16 & 0xFF) / 255.0f;
-            float sg = (colorSrc >> 8 & 0xFF) / 255.0f;
-            float sb = (colorSrc & 0xFF) / 255.0f;
-
-            float da = (colorDst >> 24 & 0xFF) / 255.0f;
-            float dr = (colorDst >> 16 & 0xFF) / 255.0f;
-            float dg = (colorDst >> 8 & 0xFF) / 255.0f;
-            float db = (colorDst & 0xFF) / 255.0f;
-
-            sr *= Math.abs(srcRGBFactor.get(sr, dr, sa, da));
-            sg *= Math.abs(srcRGBFactor.get(sg, dg, sa, da));
-            sb *= Math.abs(srcRGBFactor.get(sb, db, sa, da));
-            sa *= Math.abs(srcAlphaFactor.get(sb, db, sa, da));
-
-            dr *= Math.abs(dstRGBFactor.get(sr, dr, sa, da));
-            dg *= Math.abs(dstRGBFactor.get(sg, dg, sa, da));
-            db *= Math.abs(dstRGBFactor.get(sb, db, sa, da));
-            da *= Math.abs(dstAlphaFactor.get(sb, db, sa, da));
-
-            float cr = MathHelper.clamp(sr + dr, 0f, 1f);
-            float cg = MathHelper.clamp(sg + dg, 0f, 1f);
-            float cb = MathHelper.clamp(sb + db, 0f, 1f);
-            float ca = MathHelper.clamp(sa + da, 0f, 1f);
-
-            return (int)(ca * 255) << 24 | (int)(cr * 255) << 16 | (int)(cg * 255) << 8 | (int)(cb * 255);
-        });
-
-        public static final BlendEquation FUNC_SUBTRACT = new BlendEquation((colorSrc, colorDst, srcRGBFactor, dstRGBFactor, srcAlphaFactor, dstAlphaFactor) -> {
-            float sa = (colorSrc >> 24 & 0xFF) / 255.0f;
-            float sr = (colorSrc >> 16 & 0xFF) / 255.0f;
-            float sg = (colorSrc >> 8 & 0xFF) / 255.0f;
-            float sb = (colorSrc & 0xFF) / 255.0f;
-
-            float da = (colorDst >> 24 & 0xFF) / 255.0f;
-            float dr = (colorDst >> 16 & 0xFF) / 255.0f;
-            float dg = (colorDst >> 8 & 0xFF) / 255.0f;
-            float db = (colorDst & 0xFF) / 255.0f;
-
-            sr *= Math.abs(srcRGBFactor.get(sr, dr, sa, da));
-            sg *= Math.abs(srcRGBFactor.get(sg, dg, sa, da));
-            sb *= Math.abs(srcRGBFactor.get(sb, db, sa, da));
-            sa *= Math.abs(srcAlphaFactor.get(sb, db, sa, da));
-
-            dr *= Math.abs(dstRGBFactor.get(sr, dr, sa, da));
-            dg *= Math.abs(dstRGBFactor.get(sg, dg, sa, da));
-            db *= Math.abs(dstRGBFactor.get(sb, db, sa, da));
-            da *= Math.abs(dstAlphaFactor.get(sb, db, sa, da));
-
-            float cr = MathHelper.clamp(sr - dr, 0f, 1f);
-            float cg = MathHelper.clamp(sg - dg, 0f, 1f);
-            float cb = MathHelper.clamp(sb - db, 0f, 1f);
-            float ca = MathHelper.clamp(sa - da, 0f, 1f);
-
-            return (int)(ca * 255) << 24 | (int)(cr * 255) << 16 | (int)(cg * 255) << 8 | (int)(cb * 255);
-        });
-
-        public static final BlendEquation FUNC_REVERSE_SUBTRACT = new BlendEquation((colorSrc, colorDst, srcRGBFactor, dstRGBFactor, srcAlphaFactor, dstAlphaFactor) -> {
-            float sa = (colorSrc >> 24 & 0xFF) / 255.0f;
-            float sr = (colorSrc >> 16 & 0xFF) / 255.0f;
-            float sg = (colorSrc >> 8 & 0xFF) / 255.0f;
-            float sb = (colorSrc & 0xFF) / 255.0f;
-
-            float da = (colorDst >> 24 & 0xFF) / 255.0f;
-            float dr = (colorDst >> 16 & 0xFF) / 255.0f;
-            float dg = (colorDst >> 8 & 0xFF) / 255.0f;
-            float db = (colorDst & 0xFF) / 255.0f;
-            
-            sr *= Math.abs(srcRGBFactor.get(sr, dr, sa, da));
-            sg *= Math.abs(srcRGBFactor.get(sg, dg, sa, da));
-            sb *= Math.abs(srcRGBFactor.get(sb, db, sa, da));
-            sa *= Math.abs(srcAlphaFactor.get(sb, db, sa, da));
-
-            dr *= Math.abs(dstRGBFactor.get(sr, dr, sa, da));
-            dg *= Math.abs(dstRGBFactor.get(sg, dg, sa, da));
-            db *= Math.abs(dstRGBFactor.get(sb, db, sa, da));
-            da *= Math.abs(dstAlphaFactor.get(sb, db, sa, da));
-
-            float cr = MathHelper.clamp(dr - sr, 0f, 1f);
-            float cg = MathHelper.clamp(dg - sg, 0f, 1f);
-            float cb = MathHelper.clamp(db - sb, 0f, 1f);
-            float ca = MathHelper.clamp(da - sa, 0f, 1f);
-
-            return (int)(ca * 255) << 24 | (int)(cr * 255) << 16 | (int)(cg * 255) << 8 | (int)(cb * 255);
-        });
-
-        private final Equation equation;
-
-        private BlendEquation(Equation equation) {
-            this.equation = equation;
-        }
-
-        public int calc(int colorSrc, int colorDst, BlendFactor srcRGBFactor, BlendFactor dstRGBFactor, BlendFactor srcAlphaFactor, BlendFactor dstAlphaFactor) {
-            return this.equation.apply(colorSrc, colorDst, srcRGBFactor, dstRGBFactor, srcAlphaFactor, dstAlphaFactor);
-        }
-
-        interface Equation {
-            int apply(int colorSrc, int colorDst, BlendFactor srcRGBFactor, BlendFactor dstRGBFactor, BlendFactor srcAlphaFactor, BlendFactor dstAlphaFactor);
-        } 
-    }
-
-    public static class BlendFactor {
-        public static final BlendFactor ZERO = new BlendFactor((sc, dc, sa, da) -> 0.0f);
-        public static final BlendFactor ONE = new BlendFactor((sc, dc, sa, da) -> 1.0f);
-
-        public static final BlendFactor SRC_COLOR = new BlendFactor((sc, dc, sa, da) -> sc);
-        public static final BlendFactor DST_COLOR = new BlendFactor((sc, dc, sa, da) -> dc);
-        
-        public static final BlendFactor ONE_MINUS_SRC_COLOR = new BlendFactor((sc, dc, sa, da) -> 1.0f - sc);
-        public static final BlendFactor ONE_MINUS_DST_COLOR = new BlendFactor((sc, dc, sa, da) -> 1.0f - dc);
-
-        public static final BlendFactor SRC_ALPHA = new BlendFactor((sc, dc, sa, da) -> sa);
-        public static final BlendFactor DST_ALPHA = new BlendFactor((sc, dc, sa, da) -> da);
-
-        public static final BlendFactor ONE_MINUS_SRC_ALPHA = new BlendFactor((sc, dc, sa, da) -> 1.0f - sa);
-        public static final BlendFactor ONE_MINUS_DST_ALPHA = new BlendFactor((sc, dc, sa, da) -> 1.0f - da);
-
-        private final GetFactor getFactor;
-
-        private BlendFactor(GetFactor getFactor) {
-            this.getFactor = getFactor;
-        }
-
-        public float get(float sc, float dc, float sa, float da) {
-            return this.getFactor.get(sc, dc, sa, da);
-        }
-      
-        @FunctionalInterface
-        interface GetFactor {
-            float get(float sc, float dc, float sa, float da);
-        }
-    }
-
     // public static int blendRGBAColor(int color1, int color2) {
     //     int r1 = color1 >> 16 & 0xFF;
     //     int g1 = color1 >> 8 & 0xFF;
@@ -438,13 +305,66 @@ public class Renderer {
 
     private static boolean scissor = false;
     private static final int[] scissorBox = new int[] {0, 0, WIDTH, HEIGHT};
+    private static Stack<ScissorRect> scissorStack = new Stack<>();
+
+    static {
+        scissorStack.push(new ScissorRect(0, 0, WIDTH, HEIGHT));
+    }
+
+    static class ScissorRect {
+        public int x0;
+        public int y0;
+        public int x1;
+        public int y1;
+
+        ScissorRect(int x, int y, int width, int height) {
+            this.x0 = x;
+            this.y0 = y;
+            this.x1 = x + width;
+            this.y1 = y + height;
+        }
+    }
 
     public static void enableScissor() {
         scissor = true;
     }
 
+    public static void pushScissor(int x, int y, int width, int height) {
+        ScissorRect rect = new ScissorRect(x, y, width, height);
+
+        if (!scissorStack.empty()) {
+            ScissorRect last = scissorStack.lastElement();
+
+            rect.x0 = MathHelper.clamp(rect.x0, last.x0, last.x1);
+            rect.y0 = MathHelper.clamp(rect.y0, last.y0, last.y1);
+            rect.x1 = MathHelper.clamp(rect.x1, rect.x0, last.x1);
+            rect.y1 = MathHelper.clamp(rect.y1, rect.y0, last.y1);
+    
+            scissorStack.add(rect);
+        }
+
+        scissorBox[0] = rect.x0;
+        scissorBox[1] = rect.y0;
+        scissorBox[2] = rect.x1 - rect.x0;
+        scissorBox[3] = rect.y1 - rect.y0;
+    }
+
+    public static void popScissor() {
+        if (scissorStack.size() > 1) {
+            scissorStack.pop();
+        }
+
+        ScissorRect curr = scissorStack.lastElement();
+
+        scissorBox[0] = curr.x0;
+        scissorBox[1] = curr.y0;
+        scissorBox[2] = curr.x1 - curr.x0;
+        scissorBox[3] = curr.y1 - curr.y0;
+    }
+
     public static void disableScissor() {
         scissor = false;
+        scissorStack.clear();
     }
 
     public static void scissor(int x, int y, int width, int height) {
