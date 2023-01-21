@@ -1,0 +1,35 @@
+/**
+  * Supported formats: wav
+  */
+{
+  "entity.boss_death": {
+    "sound": "sounds/boss_death.wav"
+  },
+  "entity.death": {
+    "sound": "sounds/death.wav"
+  },
+  "entity.monster_hurt": {
+    "sound": "sounds/monster_hurt.wav"
+  },
+  "entity.player_hurt": {
+    "sound": "sounds/player_hurt.wav"
+  },
+  "random.explode": {
+    "sound": "sounds/explode.wav"
+  },
+  "random.fuse": {
+    "sound": "sounds/fuse.wav"
+  },
+  "random.pickup": {
+    "sound": "sounds/pickup.wav"
+  },
+  "ui.select": {
+    "sound": "sounds/select.wav"
+  },
+  "ui.craft": {
+    "sound": "sounds/craft.wav"
+  },
+  "ui.confirm": {
+    "sound": "sounds/confirm.wav"
+  }
+}

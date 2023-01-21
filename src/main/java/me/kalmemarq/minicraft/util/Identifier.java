@@ -1,18 +1,48 @@
 package me.kalmemarq.minicraft.util;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class Identifier implements Comparable<Identifier> {
+    private static final Pattern NAMESPACE_PATTERN = Pattern.compile("^[a-z]+$");
+    private static final Pattern PATH_PATTERN = Pattern.compile("^[a-z0-9_/.]+$");
+
     private final String namespace;
     private final String path;
 
-    public Identifier(String path) {
-        this("minicraft", path);
+    public Identifier(String id) {
+        String[] arr = new String[] { "minicraft", id };
+
+        int sepIdx = id.indexOf(':');
+        if (sepIdx >= 0) {
+            arr[1] = id.substring(sepIdx + 1);
+
+            if (sepIdx > 0) {
+                arr[0] = id.substring(0, sepIdx);
+            }
+        }
+
+        this.namespace = arr[0];
+        this.path = arr[1];
+        
+        this.validate();
     }
 
     public Identifier(String namespace, String path) {
         this.namespace = namespace;
         this.path = path;
+
+        this.validate();
+    }
+
+    private void validate() {
+        if (!NAMESPACE_PATTERN.matcher(this.namespace).matches()) {
+            throw new RuntimeException("Identifier namespace does not match regex " + NAMESPACE_PATTERN.pattern() + "' - '" + this.namespace + "'");
+        }
+
+        if (!PATH_PATTERN.matcher(this.path).matches()) {
+            throw new RuntimeException("Identifier path does not match regex " + PATH_PATTERN.pattern() + "' - '" + this.path + "'");
+        }
     }
 
     public String getNamespace() {

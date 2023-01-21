@@ -4,25 +4,25 @@ import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.Registry;
 
 public class SoundEvents {
-    public static final Registry<String> REGISTRY = new Registry<>();
+    public static final Registry<Identifier, Identifier> REGISTRY = new Registry<>();
 
-    public static final String BOSS_DEATH = register("bossdeath", "sounds/bossdeath.wav");
-    public static final String SELECT = register("select", "sounds/select.wav");
-    public static final String CONFIRM = register("confirm", "sounds/confirm.wav");
-    public static final String CRAFT = register("craft", "sounds/craft.wav");
-    public static final String DEATH = register("death", "sounds/death.wav");
-    public static final String EXPLODE = register("explode", "sounds/explode.wav");
-    public static final String FUSE = register("fuse", "sounds/fuse.wav");
-    public static final String MONSTER_HURT = register("monster_hurt", "sounds/monsterhurt.wav");
-    public static final String PICKUP = register("pickup", "sounds/pickup.wav");
-    public static final String PLAYER_HURT = register("player_hurt", "sounds/playerhurt.wav");
-
-    public static String register(String id, String path) {
-        return register(new Identifier(id), path);
+    public static Identifier register(String id) {
+        return register(new Identifier(id));
     }
 
-    public static String register(Identifier id, String path) {
-        REGISTRY.add(id, path);
-        return path;
+    public static Identifier register(Identifier id) {
+        REGISTRY.add(id, id);
+        return id;
     }
+
+    public static final Identifier BOSS_DEATH = SoundEvents.register("entity.boss_death");
+    public static final Identifier SELECT = SoundEvents.register("ui.select");
+    public static final Identifier CONFIRM = SoundEvents.register("ui.confirm");
+    public static final Identifier CRAFT = SoundEvents.register("ui.craft");
+    public static final Identifier DEATH = SoundEvents.register("entity.death");
+    public static final Identifier EXPLODE = SoundEvents.register("random.explode");
+    public static final Identifier FUSE = SoundEvents.register("random.fuse");
+    public static final Identifier MONSTER_HURT = SoundEvents.register("entity.monster_hurt");
+    public static final Identifier PICKUP = SoundEvents.register("random.pickup");
+    public static final Identifier PLAYER_HURT = SoundEvents.register("entity.player_hurt");
 }

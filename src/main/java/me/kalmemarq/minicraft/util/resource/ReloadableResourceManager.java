@@ -9,8 +9,8 @@ import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 
-import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.util.Identifier;
+import me.kalmemarq.minicraft.util.Util;
 import me.kalmemarq.minicraft.util.resource.loader.ResourceLoader;
 import me.kalmemarq.minicraft.util.resource.loader.ResourceReloader;
 import me.kalmemarq.minicraft.util.resource.pack.ResourcePack;
@@ -56,7 +56,7 @@ public class ReloadableResourceManager implements ResourceManager, AutoCloseable
         this.packs = List.copyOf(packs);
         this.updateNamespaces();
 
-        return new ResourceLoader(Minicraft.WORKER, this, this.reloaders, () -> {});
+        return new ResourceLoader(Util.WORKER, this, this.reloaders, () -> {});
     }
 
     /**
@@ -66,7 +66,7 @@ public class ReloadableResourceManager implements ResourceManager, AutoCloseable
     public ResourceLoader reload() {
         this.updateNamespaces();
 
-        return new ResourceLoader(Minicraft.WORKER, this, this.reloaders, () -> {});
+        return new ResourceLoader(Util.WORKER, this, this.reloaders, () -> {});
     }
 
     private void closePacks() {
@@ -107,7 +107,7 @@ public class ReloadableResourceManager implements ResourceManager, AutoCloseable
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         this.closePacks();
     }
 }

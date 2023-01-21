@@ -1,17 +1,26 @@
 /**
-  * { [code: string]: { name: string; region: string } }
+  * {
+      [code: string]: {  - Language unique code 
+        name: string     - Name of the language
+        region: string   - Region from where it originates
+        locale: string   - Which locale is this based on. More useful for custom languages
+      }
+    }
   */
 {
   "en_us": {
     "name": "English",
-    "region": "US"
+    "region": "US",
+    "locale": "en-US"
   },
   "pt_pt": {
     "name": "Portuguese",
-    "region": "Portugal"
+    "region": "Portugal",
+    "locale": "pt-PT"
   },
   "pt_br": {
     "name": "Portuguese",
-    "region": "Brazil"
+    "region": "Brazil",
+    "locale": "pt-BR"
   }
 }

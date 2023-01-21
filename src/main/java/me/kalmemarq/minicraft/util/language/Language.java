@@ -1,25 +1,35 @@
 package me.kalmemarq.minicraft.util.language;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.slf4j.Logger;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
-import me.kalmemarq.minicraft.util.JsonUtil;
+import me.kalmemarq.minicraft.util.Identifier;
+import me.kalmemarq.minicraft.util.Util;
+import me.kalmemarq.minicraft.util.resource.Resource;
 import me.kalmemarq.minicraft.util.resource.ResourceManager;
 import me.kalmemarq.minicraft.util.resource.loader.ResourceReloader;
 import me.kalmemarq.minicraft.util.resource.loader.SyncResourceReloader;
 
 public class Language {
+    private static final Logger LOGGER = Util.Logging.getLogger();
+    private static final Identifier LANGUAGE_METADATA = new Identifier("lang/languages.json");
+    private static final LanguageInfo DEFAULT_LANGUAGE = new LanguageInfo("en_us", "en-US", "English", "US");
+
     public static String code = "en_us";
-    public static LanguageInfo language = new LanguageInfo("en_us", "English", "US");
+    public static LanguageInfo language = DEFAULT_LANGUAGE;
     public static final List<LanguageInfo> languages = new ArrayList<>();
     private static final Map<String, String> translations = Maps.newHashMap();
 
@@ -28,31 +38,51 @@ public class Language {
         public void reload(ResourceManager manager) {
             translations.clear();
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Language.class.getResourceAsStream("/languages.json")))) {;
-                JsonObject obj = JsonUtil.deserialize(reader);
+            languages.clear();
 
-                languages.clear();
+            for (Resource res : manager.getResources(LANGUAGE_METADATA)) {
+                try (BufferedReader reader = res.getAsReader()) {
+                    ObjectNode obj = (ObjectNode)Util.Json.parse(reader);
 
-                for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
-                    JsonObject obj1 = entry.getValue().getAsJsonObject();
-                    languages.add(new LanguageInfo(entry.getKey(), JsonUtil.getString(obj1, "name"), JsonUtil.getString(obj1, "region")));
+                    Iterator<Entry<String, JsonNode>> iter = obj.fields();
+
+                    while (iter.hasNext()) {
+                       Entry<String, JsonNode> entry = iter.next();
+                       String code = entry.getKey();
+                       JsonNode value = entry.getValue();
+
+                       JsonNode name = value.get("name");
+                       JsonNode region = value.get("region");
+                       JsonNode locale = value.get("locale");
+
+                       if (name == null || region == null) continue;
+                       
+                       String lc = locale == null ? code.replace("_", "-") : locale.asText();
+                       languages.add(new LanguageInfo(entry.getKey(), lc, name.asText(), region.asText()));
+                    }
+                } catch(IOException e) {
+                    LOGGER.error("Failed to load languages.json in resource pack: {}", res.getResourcePackName(), e);
                 }
+            }
 
-                Set<String> codes = Sets.newHashSet("en_us", code);
-            
-                for (String cd : codes) {
-                    try(BufferedReader reader2 = new BufferedReader(new InputStreamReader(Language.class.getResourceAsStream("/lang/" + cd + ".json")))) {
-                        JsonObject obj2 = JsonUtil.deserialize(reader2);
+            Set<String> codes = Sets.newHashSet("en_us", code);
 
-                        for (Map.Entry<String, JsonElement> entry : obj2.entrySet()) {
-                            translations.put(entry.getKey(), entry.getValue().getAsString());
-                        }
+            for (String cd : codes) {
+                for (Resource res : manager.getResources(new Identifier("lang/" + cd + ".json"))) {
+                    try (BufferedReader reader = res.getAsReader()) {
+                        JsonNode obj = Util.Json.parse(reader);
+
+                        for (Iterator<Entry<String, JsonNode>> iter = obj.fields(); iter.hasNext();) {
+                            Entry<String, JsonNode> entry = iter.next();
+
+                            translations.put(entry.getKey(), entry.getValue().asText());
+                        }    
+                    } catch (IOException e) {
+                        LOGGER.error("Failed to load language {} in resource pack: {}", cd, res.getResourcePackName(), e);
                     }
                 }
-            } catch(Exception e) {
-                System.out.println(e);
             }
-        };
+        }
     };
 
     public static String translate(String key) {

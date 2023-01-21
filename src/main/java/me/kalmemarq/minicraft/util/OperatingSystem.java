@@ -9,6 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.Nullable;
 
+import me.kalmemarq.minicraft.Minicraft;
+
 public enum OperatingSystem {
     WINDOWS("windows") {
         @Override
@@ -64,7 +66,7 @@ public enum OperatingSystem {
            try {
                this.openURL(url);
            } catch (IOException e) {
-            //    Minicraft.LOGGER.error("Failed to open url {}", url, e);
+               Minicraft.LOGGER.error("Failed to open url {}", url, e);
            }
         });
     }
@@ -74,7 +76,7 @@ public enum OperatingSystem {
             try {
                 this.openURL(uri.toURL());
             } catch (IOException e) {
-                // Minicraft.LOGGER.error("Failed to open uri {}", uri, e);
+                Minicraft.LOGGER.error("Failed to open uri {}", uri, e);
             }
         });
     }
@@ -84,7 +86,7 @@ public enum OperatingSystem {
             try {
                 this.openURL(file.toURI().toURL());
             } catch (IOException e) {
-                // Minicraft.LOGGER.error("Failed to open file {}", file, e);
+                Minicraft.LOGGER.error("Failed to open file {}", file, e);
             }
         });
     }
@@ -94,7 +96,7 @@ public enum OperatingSystem {
             try {
                 this.openURL(new URI(uri).toURL());
             } catch (IOException | URISyntaxException e) {
-                // Minicraft.LOGGER.error("Failed to open uri {}", uri, e);
+                Minicraft.LOGGER.error("Failed to open uri {}", uri, e);
             }
         });
     }

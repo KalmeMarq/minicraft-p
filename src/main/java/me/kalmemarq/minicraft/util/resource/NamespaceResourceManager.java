@@ -8,6 +8,8 @@ import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.Lists;
+
 import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.resource.pack.ResourcePack;
 
@@ -55,7 +57,7 @@ public class NamespaceResourceManager implements ResourceManager {
             }
         }
 
-        return list;
+        return Lists.reverse(list);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package me.kalmemarq.minicraft.item;
 
+import me.kalmemarq.minicraft.Minicraft;
+
 public class ItemStack {
     public static final ItemStack EMPTY = new ItemStack(null);
 
@@ -35,7 +37,7 @@ public class ItemStack {
         } else if (this.amount >= this.getMaxAmount()) {
             this.amount = this.getMaxAmount();
 
-            System.out.println("Tried to surpase the max amount for an item");
+            Minicraft.LOGGER.warn("Tried to surpase the max amount for an item");
         }
     }
 

@@ -4,27 +4,27 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
-public class Registry<T> {
-    private final Map<Identifier, T> idToEntry = new HashMap<>();
-    private final Map<T, Identifier> entryToId = new HashMap<>();
+public class Registry<K, T> {
+    private final Map<K, T> idToEntry = new HashMap<>();
+    private final Map<T, K> entryToId = new HashMap<>();
 
-    public void add(Identifier id, T value) {
+    public void add(K id, T value) {
         this.idToEntry.put(id, value);
         this.entryToId.put(value, id);
     }
 
-    public Identifier getId(T value) {
+    public K getId(T value) {
         return this.entryToId.get(value);
     }
     
     @Nullable
-    public T get(Identifier id) {
+    public T get(K id) {
         return this.idToEntry.get(id);
     }
 
-    public boolean containsId(Identifier id) {
+    public boolean containsId(K id) {
         return this.idToEntry.containsKey(id);
     }
 

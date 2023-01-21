@@ -1,15 +1,21 @@
 package me.kalmemarq.minicraft.gfx;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.imageio.ImageIO;
+
 import org.jetbrains.annotations.Nullable;
 
+import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.math.AABB;
 import me.kalmemarq.minicraft.util.math.MathHelper;
+import me.kalmemarq.minicraft.util.resource.Resource;
 
 public class Renderer {
     public static final int WIDTH = 320;
@@ -18,14 +24,16 @@ public class Renderer {
     public static int[] zbuffer = new int[WIDTH * HEIGHT];
     public static int[] pixels = new int[WIDTH * HEIGHT];
 
+    @Deprecated
     public static final Map<String, MinicraftImage> images = new HashMap<>();
     public static final Map<Identifier, MinicraftImage> textures = new HashMap<>();
 
     public static final Stack<Camera> cameraStack = new Stack<>();
     public static Camera camera = new Camera();
 
-    public static void loadImages() {
+    public static void loadTitleTexture() {
         images.put("title.png", new MinicraftImage("/title.png"));
+        textures.put(new Identifier("textures/title.png"), new MinicraftImage("/title.png"));
     }
 
     public static void reset() {
@@ -299,8 +307,8 @@ public class Renderer {
         texture = false;
     }
 
-    public static void setGTexture(@Nullable MinicraftImage texture) {
-        gtexture = texture;
+    public static void setGTexture(@Nullable Identifier texture) {
+        gtexture = texture == null ? null : textures.get(texture);
     }
 
     private static boolean scissor = false;
@@ -540,20 +548,33 @@ public class Renderer {
         }
     }
 
-    public static void renderTexturedQuad(MinicraftImage image, int x, int y, int width, int height) {
-        renderTexturedQuad(image, x, y, width, height, 0, 0);
+    public static void renderTexturedQuad(Identifier texture, int x, int y, int width, int height) {
+        renderTexturedQuad(texture, x, y, width, height, 0, 0);
     }
 
-    public static void renderTexturedQuad(MinicraftImage image, int x, int y, int width, int height, int u, int v) {
-        renderTexturedQuad(image, x, y, width, height, u, v, width, height);
+    public static void renderTexturedQuad(Identifier texture, int x, int y, int width, int height, int u, int v) {
+        renderTexturedQuad(texture, x, y, width, height, u, v, width, height);
     }
 
-    public static void renderTexturedQuad(MinicraftImage image, int x, int y, int width, int height, int u, int v, int regionWidth, int regionHeight) {
-        renderTexturedQuad(image, x, y, 0, width, height, u, v, regionWidth, regionHeight);
+    public static void renderTexturedQuad(Identifier texture, int x, int y, int width, int height, int u, int v, int regionWidth, int regionHeight) {
+        renderTexturedQuad(texture, x, y, 0, width, height, u, v, regionWidth, regionHeight);
     }
 
-    public static void renderTexturedQuad(MinicraftImage image, int x, int y, int z, int width, int height, int u, int v, int regionWidth, int regionHeight) {
-        if (image == null) return;
+    public static void renderTexturedQuad(Identifier texture, int x, int y, int z, int width, int height, int u, int v, int regionWidth, int regionHeight) {
+        MinicraftImage image = textures.get(texture);
+        if (image == null) {
+            Resource res = Minicraft.getInstance().resourceManager.getResource(texture);
+            
+            if (res != null) {
+                try(InputStream stream = res.getAsInputStream()) {
+                    image = new MinicraftImage(ImageIO.read(stream));
+                    textures.put(texture, image);
+                } catch (IOException e) {
+                }
+            }
+
+            if (image == null) return;
+        }
 
         x -= Renderer.camera.tx();
         y -= Renderer.camera.ty();

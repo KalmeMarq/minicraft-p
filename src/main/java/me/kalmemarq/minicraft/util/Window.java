@@ -30,11 +30,14 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.gfx.Renderer;
 
 public class Window {
+    private static final Logger LOGGER = Util.Logging.getLogger();
+
     private final JFrame frame;
 
     private final BufferedImage image;
@@ -156,6 +159,9 @@ public class Window {
             this.x = this.frame.getLocationOnScreen().getX();
             this.y = this.frame.getLocationOnScreen().getY();
         } catch(Exception ignored) {}
+
+        // Render first frame (all black) so it doesn't flash from the jframe grey bg to the black canvas bg
+        this.renderFrame();
     }
 
     public void setIcon(@Nullable InputStream icon32, @Nullable InputStream icon64) {
@@ -167,10 +173,10 @@ public class Window {
                 icons.add(icon);
                 icon32.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to load icon32", e);
             }
         } else {
-            System.out.println("icon32 was not provided");
+            LOGGER.warn("icon32 was not provided");
         }
 
         if (icon64 != null) {
@@ -179,10 +185,10 @@ public class Window {
                 icons.add(icon);
                 icon64.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to load icon64", e);
             }
         } else {
-            System.out.println("icon64 was not provided");
+            LOGGER.warn("icon64 was not provided");
         }
 
         this.frame.setIconImages(icons);
@@ -264,7 +270,6 @@ public class Window {
         if (!this.bufferStrategy.contentsLost()) {
             this.bufferStrategy.show();
         }
-
         // #endregion
     }
 

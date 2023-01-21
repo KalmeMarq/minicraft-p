@@ -3,10 +3,12 @@ package me.kalmemarq.minicraft.gui;
 import org.jetbrains.annotations.Nullable;
 
 import me.kalmemarq.minicraft.gfx.Renderer;
+import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.Keys;
-import me.kalmemarq.minicraft.util.SplashManager;
 
 public class TitleMenu extends Menu {
+    private static final Identifier TITLE = new Identifier("textures/title.png");
+
     @Nullable
     private String splash;
     private int splashColor;
@@ -35,7 +37,7 @@ public class TitleMenu extends Menu {
     @Override
     public void keyPressed(int code) {
         if (code == Keys.KEY_R) {
-            this.splash = SplashManager.getSplash();
+            this.splash = this.mc.textManager.getSplash();
         } else {
             super.keyPressed(code);
         }
@@ -51,7 +53,7 @@ public class TitleMenu extends Menu {
     @Override
     public void update() {
         if (this.splash == null) {
-            this.splash = SplashManager.getSplash();
+            this.splash = this.mc.textManager.getSplash();
         }
 
         if (this.splash != null) {
@@ -65,7 +67,9 @@ public class TitleMenu extends Menu {
 
     @Override
     public void render() {
-        Renderer.render("title.png", Renderer.WIDTH / 2 - 60, 30);
+        Renderer.enableTexture();
+        Renderer.renderTexturedQuad(TITLE, Renderer.WIDTH / 2 - 60, 30, 120, 16);
+        Renderer.disableTexture();
 
         this.font.render("Version 1.0.0", 1, 1, 0x555555);
 

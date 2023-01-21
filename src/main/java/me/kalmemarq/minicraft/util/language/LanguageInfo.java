@@ -8,26 +8,26 @@ public class LanguageInfo {
     private final String name;
     private final String region;
 
-    public LanguageInfo(String code, String name, String region) {
+    public LanguageInfo(String code, String locale, String name, String region) {
         this.code = code;
         this.name = name;
         this.region = region;
-        this.locale = Locale.forLanguageTag(code.replace("_", "-"));
+        this.locale = Locale.forLanguageTag(locale);
     }
 
     public String getCode() {
-      return code;
+      return this.code;
     }
 
     public Locale getLocale() {
-      return locale;
+      return this.locale;
     }
 
     public String getName() {
-      return name;
+      return this.name;
     }
 
     public String getRegion() {
-      return region;
+      return this.region;
     }
 }

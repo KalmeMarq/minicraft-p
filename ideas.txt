@@ -1,0 +1,12 @@
+Data Packs
+
+Skin Packs
+
+Dynamic registry so that items, tiles, entities can be data driven :)
+
+datapack/
+  data/
+    minicraft/
+      entities/*.json
+      items/*.json
+      tiles/*.json

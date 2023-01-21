@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.ImmutableSet;
 
+import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.util.Identifier;
 
 public class VanillaResourcePack extends ResourcePack {
@@ -33,7 +34,7 @@ public class VanillaResourcePack extends ResourcePack {
         this.root = this.getRoot();
 
         if (this.root == null) {
-            System.out.println("Well... fuck");
+            Minicraft.LOGGER.error("The vanilla resource pack was unable to build so yeah... we're all fucked");
         }
     }
 
@@ -41,7 +42,7 @@ public class VanillaResourcePack extends ResourcePack {
     @Override
     public InputStream open(Identifier id) {
         if (this.root == null) return null;
-
+        
         Path file = this.root.resolve("assets/" + id.getNamespace() + "/" + id.getPath());
 
         if (Files.exists(file, new LinkOption[0])) {

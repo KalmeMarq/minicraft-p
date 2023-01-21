@@ -1,7 +1,13 @@
 package me.kalmemarq.minicraft.util.sound;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,20 +17,28 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 
+import me.kalmemarq.minicraft.util.Identifier;
+import me.kalmemarq.minicraft.util.Util;
+import me.kalmemarq.minicraft.util.resource.Resource;
 import me.kalmemarq.minicraft.util.resource.ResourceManager;
 import me.kalmemarq.minicraft.util.resource.loader.SyncResourceReloader;
 
 public class SoundManager extends SyncResourceReloader implements AutoCloseable {
+    protected static final Logger LOGGER = Util.Logging.getLogger();
+    private static final Identifier SOUND_DEFINITIONS = new Identifier("sounds/sounds.json");
+
     private static final int MAX_CLIP_POOL_SIZE = 4;
 
-    private final Map<String, SoundBuffer> buffers = Maps.newHashMap();
-    private final Map<String, Integer> clipCounts = Maps.newHashMap();
-    private final Map<String, Clip> sounds = new ConcurrentHashMap<>();
+    private final Map<Identifier, SoundBuffer> buffers = Maps.newHashMap();
+    private final Map<Identifier, Integer> clipCounts = Maps.newHashMap();
+    private final Map<Identifier, Clip> sounds = new ConcurrentHashMap<>();
 
-    public void play(String sound) {
+    public void play(Identifier sound) {
         this.play(sound, 1.0f);
     }
 
@@ -32,7 +46,7 @@ public class SoundManager extends SyncResourceReloader implements AutoCloseable 
         return clip.isControlSupported(FloatControl.Type.VOLUME);
     }
 
-    public void play(String sound, float volume) {
+    public void play(Identifier sound, float volume) {
         if (volume < 0) volume = 0;
         if (volume > 1) volume = 1;
 
@@ -57,7 +71,7 @@ public class SoundManager extends SyncResourceReloader implements AutoCloseable 
                 SoundBuffer buffer = buffers.get(sound);
 
                 if (buffer == null) {
-                    System.out.println("No sound buffer found for " + sound);
+                    LOGGER.warn("No sound buffer found for {}", sound);
                     return;
                 }
 
@@ -80,13 +94,13 @@ public class SoundManager extends SyncResourceReloader implements AutoCloseable 
     }
 
     @Nullable
-    private Clip createClip(String sound) {
+    private Clip createClip(Identifier sound) {
         try {
 
             SoundBuffer buffer = buffers.get(sound);
 
             if (buffer == null) {
-                System.out.println("No sound buffer found for " + sound);
+                LOGGER.warn("No sound buffer found for {}", sound);
                 return null;
             }
 
@@ -100,7 +114,7 @@ public class SoundManager extends SyncResourceReloader implements AutoCloseable 
     }
     
     public void stopAll() {
-        for (Map.Entry<String, Clip> entry : sounds.entrySet()) {
+        for (Map.Entry<Identifier, Clip> entry : sounds.entrySet()) {
             Clip clip = entry.getValue();
             clip.stop();
             clip.flush();
@@ -115,15 +129,50 @@ public class SoundManager extends SyncResourceReloader implements AutoCloseable 
         stopAll();
         buffers.clear();
 
-        for (String sound : SoundEvents.REGISTRY.values()) {
-            buffers.put(sound, new SoundBuffer(sound));
+        Map<Identifier, Identifier> map = new HashMap<>();
+
+        for (Resource res : manager.getResources(SOUND_DEFINITIONS)) {
+            try (BufferedReader reader = res.getAsReader()) {
+                JsonNode obj = Util.Json.parse(reader);
+
+                for (Iterator<Entry<String, JsonNode>> iter = obj.fields(); iter.hasNext();) {
+                    Entry<String, JsonNode> entry = iter.next();
+
+                    Identifier soundId = new Identifier(entry.getKey());
+                    JsonNode soundPath = entry.getValue().get("sound");
+                    
+                    if (soundPath != null && soundPath.isTextual()) {
+                        try {
+                            map.put(soundId, new Identifier(soundPath.asText()));
+                        } catch (RuntimeException e) {
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                LOGGER.error("Failed to load sounds.json in resource pack: {}", res.getResourcePackName(), e);
+            }
         }
 
-        Set<String> preload = new HashSet<>();
+        for (Entry<Identifier, Identifier> entry : map.entrySet()) {
+            Resource res = manager.getResource(entry.getValue());
+
+            if (res != null) {
+                try (InputStream stream = res.getAsInputStream()) {
+                    SoundBuffer buffer = new SoundBuffer(entry.getKey(), stream);
+
+                    if (!buffer.failedToLoad) {
+                        buffers.put(entry.getKey(), buffer);
+                    }
+                } catch (IOException e) {}
+            }
+        }
+
+        Set<Identifier> preload = new HashSet<>();
         preload.add(SoundEvents.CONFIRM);
         preload.add(SoundEvents.SELECT);
 
-        for (String sound : preload) {
+        for (Identifier sound : preload) {
             sounds.put(sound, createClip(sound));
             clipCounts.put(sound, 1);
         }

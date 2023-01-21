@@ -6,7 +6,7 @@ import me.kalmemarq.minicraft.world.Level;
 import me.kalmemarq.minicraft.world.World;
 
 public class EntityType<T extends Entity> {
-    public static final Registry<EntityType<?>> ENTITY_TYPE_REGISTRY = new Registry<>();
+    public static final Registry<Identifier, EntityType<?>> ENTITY_TYPE_REGISTRY = new Registry<>();
 
     public static final EntityType<PlayerEntity> PLAYER = register("player", PlayerEntity::new);
 
