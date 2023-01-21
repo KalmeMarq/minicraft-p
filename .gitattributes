@@ -1,2 +1,2 @@
-*.bat           text eol=crlf
-.json           linguist-language=json5
+*.bat text eol=crlf
+.json linguist-language=JSON with Comments
