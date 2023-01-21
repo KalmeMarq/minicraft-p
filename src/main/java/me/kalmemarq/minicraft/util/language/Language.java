@@ -25,7 +25,7 @@ import me.kalmemarq.minicraft.util.resource.loader.SyncResourceReloader;
 
 public class Language {
     private static final Logger LOGGER = Util.Logging.getLogger();
-    private static final Identifier LANGUAGE_METADATA = new Identifier("lang/languages.json");
+    private static final Identifier LANGUAGE_METADATA = new Identifier("languages/languages.json");
     private static final LanguageInfo DEFAULT_LANGUAGE = new LanguageInfo("en_us", "en-US", "English", "US");
 
     public static String code = "en_us";
@@ -68,7 +68,7 @@ public class Language {
             Set<String> codes = Sets.newHashSet("en_us", code);
 
             for (String cd : codes) {
-                for (Resource res : manager.getResources(new Identifier("lang/" + cd + ".json"))) {
+                for (Resource res : manager.getResources(new Identifier("languages/" + cd + ".json"))) {
                     try (BufferedReader reader = res.getAsReader()) {
                         JsonNode obj = Util.Json.parse(reader);
 

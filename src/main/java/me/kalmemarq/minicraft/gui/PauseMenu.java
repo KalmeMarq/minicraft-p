@@ -37,7 +37,7 @@ public class PauseMenu extends Menu {
         }
 
         // What the fuck is happening with the render panel
-        Renderer.fillRect(Renderer.WIDTH / 2 - 112, (Renderer.HEIGHT - panelH) / 2, 224, panelH, 0xFF_00_00_88);
+        Renderer.renderColoredQuad(Renderer.WIDTH / 2 - 112, (Renderer.HEIGHT - panelH) / 2, 224, panelH, 0xFF_00_00_88);
 
         super.render();
     }

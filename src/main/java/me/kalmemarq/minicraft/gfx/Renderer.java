@@ -32,7 +32,7 @@ public class Renderer {
     public static Camera camera = new Camera();
 
     public static void loadTitleTexture() {
-        images.put("title.png", new MinicraftImage("/title.png"));
+        images.put("title.png", new MinicraftImage("/assets/minicraft/textures/title.png"));
         textures.put(new Identifier("textures/title.png"), new MinicraftImage("/title.png"));
     }
 
@@ -63,6 +63,7 @@ public class Renderer {
         }
     }
 
+    @Deprecated
     public static void fillRect(int x, int y, int width, int height, int color) {
         int xt = x - Renderer.camera.tx();
         int yt = y - Renderer.camera.ty();
@@ -78,10 +79,12 @@ public class Renderer {
         }
     }
 
+    @Deprecated
     public static void render(String image, int x, int y) {
         render(getImage(image), x, y);
     }
 
+    @Deprecated
     public static void render(MinicraftImage image, int x, int y) {
         int xt = x - Renderer.camera.tx();
         int yt = y - Renderer.camera.ty();
@@ -109,14 +112,17 @@ public class Renderer {
         }
     }
 
+    @Deprecated
     public static void render(String image, int x, int y, int u, int v, int us, int vs) {
         render(getImage(image), x, y, u, v, us, vs);
     }
 
+    @Deprecated
     public static void render(String image, int x, int y, int u, int v, int us, int vs, int color) {
         render(getImage(image), x, y, u, v, us, vs, color);
     }
 
+    @Deprecated
     public static void render(MinicraftImage image, int x, int y, int u, int v, int us, int vs, int color) {
         int xt = x - Renderer.camera.tx();
         int yt = y - Renderer.camera.ty();
@@ -148,6 +154,7 @@ public class Renderer {
         return color1;
     }
 
+    @Deprecated
     public static void render(MinicraftImage image, int x, int y, int u, int v, int us, int vs) {
         int xt = x - Renderer.camera.tx();
         int yt = y - Renderer.camera.ty();
@@ -195,23 +202,23 @@ public class Renderer {
         render(image, xt + width - 8, yt + height - 8, 16, 40, 8, 8);
     }
 
-    private static void resetG() {
-        scissor = false;
-        blend = false;
-        scissorBox[0] = 0;
-        scissorBox[1] = 0;
-        scissorBox[2] = WIDTH;
-        scissorBox[3] = HEIGHT;
-        // blendColor[0] = 1.0f;
-        // blendColor[1] = 1.0f;
-        // blendColor[2] = 1.0f;
-        // blendColor[3] = 1.0f;
-        blendEquation = BlendEquation.FUNC_ADD;
-        srcRGBFactor = BlendFactor.SRC_ALPHA;
-        dstRGBFactor = BlendFactor.ONE_MINUS_SRC_ALPHA;
-        srcAlphaFactor = BlendFactor.SRC_ALPHA;
-        dstAlphaFactor = BlendFactor.ONE_MINUS_SRC_ALPHA;
-    }
+    // private static void resetG() {
+    //     scissor = false;
+    //     blend = false;
+    //     scissorBox[0] = 0;
+    //     scissorBox[1] = 0;
+    //     scissorBox[2] = WIDTH;
+    //     scissorBox[3] = HEIGHT;
+    //     // blendColor[0] = 1.0f;
+    //     // blendColor[1] = 1.0f;
+    //     // blendColor[2] = 1.0f;
+    //     // blendColor[3] = 1.0f;
+    //     blendEquation = BlendEquation.FUNC_ADD;
+    //     srcRGBFactor = BlendFactor.SRC_ALPHA;
+    //     dstRGBFactor = BlendFactor.ONE_MINUS_SRC_ALPHA;
+    //     srcAlphaFactor = BlendFactor.SRC_ALPHA;
+    //     dstAlphaFactor = BlendFactor.ONE_MINUS_SRC_ALPHA;
+    // }
 
     public static void clear() {
         Arrays.fill(Renderer.zbuffer, 0);
@@ -585,13 +592,66 @@ public class Renderer {
             if (xx < 0 || xx >= Renderer.WIDTH) continue;
             if (scissor && (xx < scissorBox[0] || xx >= scissorBox[2])) continue;   
         
-            for (int yy = y, ys = 0; yy < y + height; yy++, ys++) {
+            for (int yy = y, ys = v; yy < y + height; yy++, ys++) {
                 if (yy < 0 || yy >= Renderer.HEIGHT) continue;
                 if (scissor && (yy < scissorBox[1] || yy >= scissorBox[3])) continue;
                 
                 int pIdx = yy * Renderer.WIDTH + xx;
             
                 colors[0] = image.getPixels()[ys * image.getWidth() + xs];
+                colors[1] = pixels[pIdx];
+
+                if (depthTest) {
+                    testDepth(pIdx, colors, z);
+                }
+
+                if (blend) pixels[pIdx] = blendEquation.calc(colors[0], colors[1], srcRGBFactor, dstRGBFactor, srcAlphaFactor, dstAlphaFactor);
+                else {
+                    if ((colors[0] >> 24 & 0xFF) != 0) { // Discard color if alpha == 0 
+                        pixels[pIdx] = colors[0];
+                    }
+                }
+            }
+        }
+    }
+
+    public static void renderColoredTexturedQuad(Identifier texture, int x, int y, int width, int height, int u, int v, int color) {
+        renderColoredTexturedQuad(texture, x, y, 0, width, height, u, v, width, height, color);
+    }
+    
+    public static void renderColoredTexturedQuad(Identifier texture, int x, int y, int z, int width, int height, int u, int v, int regionWidth, int regionHeight, int color) {
+        MinicraftImage image = textures.get(texture);
+        if (image == null) {
+            Resource res = Minicraft.getInstance().resourceManager.getResource(texture);
+            
+            if (res != null) {
+                try(InputStream stream = res.getAsInputStream()) {
+                    image = new MinicraftImage(ImageIO.read(stream));
+                    textures.put(texture, image);
+                } catch (IOException e) {
+                }
+            }
+
+            if (image == null) return;
+        }
+
+        x -= Renderer.camera.tx();
+        y -= Renderer.camera.ty();
+
+        int[] colors = { 0, 0 };
+
+        for (int xx = x, xs = u; xx < x + width; xx++, xs++) {
+            if (xx < 0 || xx >= Renderer.WIDTH) continue;
+            if (scissor && (xx < scissorBox[0] || xx >= scissorBox[2])) continue;   
+        
+            for (int yy = y, ys = v; yy < y + height; yy++, ys++) {
+                if (yy < 0 || yy >= Renderer.HEIGHT) continue;
+                if (scissor && (yy < scissorBox[1] || yy >= scissorBox[3])) continue;
+                
+                int pIdx = yy * Renderer.WIDTH + xx;
+            
+                colors[0] = image.getPixels()[ys * image.getWidth() + xs];
+                if ((colors[0] >> 16 & 0xFF) == 0xFF && (colors[0] >> 8 & 0xFF) == 0xFF && (colors[0] & 0xFF) == 0xFF) colors[0] = color;
                 colors[1] = pixels[pIdx];
 
                 if (depthTest) {

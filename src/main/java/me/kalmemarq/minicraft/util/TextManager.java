@@ -86,7 +86,7 @@ public class TextManager extends SyncResourceReloader {
 
         do {
             str = splashes.get(RANDOM.nextInt(splashes.size()));
-        } while (!str.equals("Secret Splash!"));
+        } while (str.equals("Secret Splash!"));
 
 		return str;
     }

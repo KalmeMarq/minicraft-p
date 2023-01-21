@@ -3,8 +3,11 @@ package me.kalmemarq.minicraft.util;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.StackWalker.Option;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -13,25 +16,43 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import me.kalmemarq.minicraft.Minicraft;
 
 public final class Util {
     private Util() {}
 
-    public static ExecutorService WORKER = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Worker-Main").build());
+    private static final List<ExecutorService> WORKERS = new ArrayList<>();
+    public static ExecutorService WORKER = Util.createWorker("Worker-Main");
     
-    public static void shutdownWorkers() {
-        WORKER.shutdown();
-        boolean terminated;
-        try {
-            terminated = WORKER.awaitTermination(2L, TimeUnit.SECONDS);
-        } catch(Exception e) {
-            e.printStackTrace();
-            terminated = false;
-        }
+    private static ExecutorService createWorker(String name) {
+        ExecutorService executor = new ForkJoinPool(Math.min(0x7fff, Runtime.getRuntime().availableProcessors()), pool -> {
+            ForkJoinWorkerThread worker = new ForkJoinWorkerThread(pool) {
+            };
+            worker.setName(name);
+            return worker;
+        }, (thread, t) -> {
+            Minicraft.LOGGER.error("Exception in thread {}", thread.getName(), t);            
+        }, true);
 
-        if (!terminated) {
-            WORKER.shutdownNow();
+        WORKERS.add(executor);
+        return executor;
+    }
+
+    public static void shutdownWorkers() {
+        for (ExecutorService worker : WORKERS) {
+            worker.shutdown();
+            boolean terminated;
+            try {
+                terminated = worker.awaitTermination(2L, TimeUnit.SECONDS);
+            } catch(Exception e) {
+                e.printStackTrace();
+                terminated = false;
+            }
+    
+            if (!terminated) {
+                worker.shutdownNow();
+            }
         }
     }
 

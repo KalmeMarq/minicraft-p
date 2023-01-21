@@ -17,6 +17,8 @@ import me.kalmemarq.minicraft.util.resource.loader.SyncResourceReloader;
 
 public class Font {
     private static final Identifier FONT_METADATA = new Identifier("font.json"); 
+    private static final Identifier FONT = new Identifier("textures/default_font.png");
+
     private static final Map<Integer, GlyphInfo> glyphInfos = Maps.newHashMap();
 
     public static final ResourceReloader reloader = new SyncResourceReloader() {
@@ -73,6 +75,10 @@ public class Font {
     public void render(String text, int x, int y, int color) {
         text = toUpperCase(text);
 
+        if ((color >> 24 & 0xFF) == 0) {
+            color |= 0xFF << 24;
+        }
+
         int xx = x;
 
         int[] chrs = text.codePoints().toArray();
@@ -84,7 +90,7 @@ public class Font {
                 GlyphInfo ii = glyphInfos.get(chr);
 
                 if (ii != null) {
-                    Renderer.render("default_font.png", xx, y, ii.u, ii.v, 8, 8, color);
+                    Renderer.renderColoredTexturedQuad(FONT, xx, y, 8, 8, ii.u, ii.v, color);
                 }
             }
 
