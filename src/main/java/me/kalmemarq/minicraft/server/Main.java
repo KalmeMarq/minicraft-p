@@ -1,49 +1,44 @@
 package me.kalmemarq.minicraft.server;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-
-import me.kalmemarq.minicraft.util.optionparser.ArgOption;
-import me.kalmemarq.minicraft.util.optionparser.ArgOptionParser;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import me.kalmemarq.minicraft.network.PacketDecoder;
+import me.kalmemarq.minicraft.network.PacketEncoder;
+import me.kalmemarq.minicraft.server.network.ServerNetworkHandler;
+import me.kalmemarq.optionparser.ArgOption;
+import me.kalmemarq.optionparser.ArgOptionParser;
 
 public class Main {
-    public static void main(String[] args) {
+    private static final boolean EPOLL = Epoll.isAvailable();
+
+    public static void main(String[] args) throws InterruptedException {
         ArgOptionParser optionParser = new ArgOptionParser();
-        ArgOption<Integer> serverPort = optionParser.accepts("serverPort", Integer.class);
+        ArgOption<Integer> serverPort = optionParser.accepts("serverPort", Integer.class).defaultsTo(25565);
         optionParser.parse(args);
-
-        Socket socket = null;
-        ServerSocket server = null;
-        DataInputStream in =  null;
-    
-        try {
-            server = new ServerSocket(serverPort.getValue());
-            System.out.println("Server started");
-            System.out.println("Waiting for client");
-            socket = server.accept();
-            System.out.println("Client accepted");
-            in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-
-            String line = "";
-
-            while (!line.equals("Over")) {
-                try {
-                    line = in.readUTF();
-                    System.out.println(line);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            System.out.println("Closing connection");
         
-            socket.close();
-            in.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        ServerRunArgs runArgs = ServerRunArgs.fromArgs(serverPort);
+
+        EventLoopGroup eventLoopGroup = EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+
+        try {
+            new ServerBootstrap()
+                .group(eventLoopGroup)
+                .channel(EPOLL ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<Channel>() {
+                    protected void initChannel(Channel channel) throws Exception {
+                        channel.pipeline().addLast(new PacketDecoder()).addLast(new PacketEncoder()).addLast(new ServerNetworkHandler());
+                    }
+                })
+                .bind(runArgs.port()).sync().channel().closeFuture().syncUninterruptibly();
+        } finally {
+            eventLoopGroup.shutdownGracefully();
         }
     }
 }

@@ -1,8 +1,8 @@
-package me.kalmemarq.minicraft.gui;
+package me.kalmemarq.minicraft.client.gui;
 
 import org.jetbrains.annotations.Nullable;
 
-import me.kalmemarq.minicraft.gfx.Renderer;
+import me.kalmemarq.minicraft.client.gfx.Renderer;
 import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.Keys;
 

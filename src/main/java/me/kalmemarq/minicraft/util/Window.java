@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import me.kalmemarq.minicraft.Minicraft;
-import me.kalmemarq.minicraft.gfx.Renderer;
+import me.kalmemarq.minicraft.client.gfx.Renderer;
 
 public class Window {
     private static final Logger LOGGER = Util.Logging.getLogger();

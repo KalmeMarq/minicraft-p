@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.gui;
+package me.kalmemarq.minicraft.client.gui;
 
 public abstract class Entry {
     public boolean enabled = true;

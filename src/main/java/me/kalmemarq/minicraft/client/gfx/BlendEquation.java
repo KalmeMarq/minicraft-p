@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.gfx;
+package me.kalmemarq.minicraft.client.gfx;
 
 import me.kalmemarq.minicraft.util.math.MathHelper;
 

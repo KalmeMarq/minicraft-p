@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.util.optionparser;
+package me.kalmemarq.optionparser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,24 +86,29 @@ public class ArgOption<T> {
     }
 
     private Boolean isboolean = null;
-        private boolean isBoolean() {
-            if (this.isboolean == null) {
-                try {
-                    Object obj = type.getMethod("valueOf", String.class).invoke(null, "true");
-                    
-                    if (obj instanceof Boolean) {
-                        this.isboolean = true;
-                    }
-                } catch(Exception e) {
-                    e.printStackTrace();
+    private boolean isBoolean() {
+        if (this.type == String.class) return false;
+        if (this.type == Boolean.class) return true;
+
+        if (this.isboolean == null) {
+            try {
+                Object obj = type.getMethod("valueOf", String.class).invoke(null, "true");
+                
+                if (obj instanceof Boolean) {
+                    this.isboolean = true;
                 }
+            } catch(Exception e) {
+                e.printStackTrace();
             }
-            return isboolean != null;
         }
+        return isboolean != null;
+    }
 
     @SuppressWarnings("unchecked")
-    public void parseValues(List<String> values) {
-        if (values.isEmpty()) {
+    public void parseValues(List<String> vls) {
+        this.values.clear();
+
+        if (vls.isEmpty()) {
             try {
                 Object obj = type.getMethod("valueOf", String.class).invoke(null, "true");
                 if (obj instanceof Boolean) {
@@ -115,7 +120,7 @@ public class ArgOption<T> {
                 e.printStackTrace();
             }
         } else {
-            values.forEach(val -> {
+            vls.forEach(val -> {
                 try {
                     if (this.type.isPrimitive()) {
                         Object obj = type.getMethod("valueOf", String.class).invoke(null, val);

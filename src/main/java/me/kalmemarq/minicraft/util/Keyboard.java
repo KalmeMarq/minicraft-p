@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import me.kalmemarq.minicraft.Minicraft;
-import me.kalmemarq.minicraft.gui.PauseMenu;
+import me.kalmemarq.minicraft.client.gui.PauseMenu;
 
 public class Keyboard {
     private final Minicraft mc;

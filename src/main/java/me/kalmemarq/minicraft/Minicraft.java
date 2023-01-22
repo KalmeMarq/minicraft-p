@@ -13,12 +13,12 @@ import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import me.kalmemarq.minicraft.gfx.Font;
-import me.kalmemarq.minicraft.gfx.MinicraftImage;
-import me.kalmemarq.minicraft.gfx.Renderer;
-import me.kalmemarq.minicraft.gui.Menu;
-import me.kalmemarq.minicraft.gui.TitleMenu;
-import me.kalmemarq.minicraft.main.RunArgs;
+import me.kalmemarq.minicraft.client.ClientRunArgs;
+import me.kalmemarq.minicraft.client.gfx.Font;
+import me.kalmemarq.minicraft.client.gfx.MinicraftImage;
+import me.kalmemarq.minicraft.client.gfx.Renderer;
+import me.kalmemarq.minicraft.client.gui.Menu;
+import me.kalmemarq.minicraft.client.gui.TitleMenu;
 import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.TextManager;
@@ -74,7 +74,7 @@ public class Minicraft {
     public int currentFPS;
     public int currentTicks;
     
-    public Minicraft(RunArgs runArgs) {
+    public Minicraft(ClientRunArgs runArgs) {
         INSTANCE = this;
         debug = runArgs.debug();
         this.resourcePackManager = new ResourcePackManager();
@@ -151,7 +151,7 @@ public class Minicraft {
                 currentFPS = frameCounter;
                 currentTicks = tickCounter;
                 
-                if (debug && !this.options.showDebugFPS) System.out.printf("%d FPS %d TPS", currentFPS, currentTicks);
+                if (debug && !this.options.showDebugFPS) System.out.printf("%d FPS %d TPS\n", currentFPS, currentTicks);
                 
                 frameCounter = 0;
                 tickCounter = 0;

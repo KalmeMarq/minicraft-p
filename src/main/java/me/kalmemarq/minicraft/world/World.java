@@ -1,6 +1,6 @@
 package me.kalmemarq.minicraft.world;
 
-import me.kalmemarq.minicraft.gfx.Renderer;
+import me.kalmemarq.minicraft.client.gfx.Renderer;
 import me.kalmemarq.minicraft.util.Keybinding;
 
 public class World {

@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.gfx;
+package me.kalmemarq.minicraft.client.gfx;
 
 public class BlendFactor {
     public static final BlendFactor ZERO = new BlendFactor((sc, dc, sa, da) -> 0.0f);

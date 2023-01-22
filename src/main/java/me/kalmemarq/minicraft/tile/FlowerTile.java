@@ -1,6 +1,6 @@
 package me.kalmemarq.minicraft.tile;
 
-import me.kalmemarq.minicraft.gfx.Renderer;
+import me.kalmemarq.minicraft.client.gfx.Renderer;
 import me.kalmemarq.minicraft.world.Level;
 import me.kalmemarq.minicraft.world.World;
 

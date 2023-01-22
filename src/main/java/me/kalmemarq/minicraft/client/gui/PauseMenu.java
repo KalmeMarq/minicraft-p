@@ -1,6 +1,6 @@
-package me.kalmemarq.minicraft.gui;
+package me.kalmemarq.minicraft.client.gui;
 
-import me.kalmemarq.minicraft.gfx.Renderer;
+import me.kalmemarq.minicraft.client.gfx.Renderer;
 
 public class PauseMenu extends Menu {
     public PauseMenu() {

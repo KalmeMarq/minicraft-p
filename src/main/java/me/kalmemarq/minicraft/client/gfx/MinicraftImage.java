@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.gfx;
+package me.kalmemarq.minicraft.client.gfx;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

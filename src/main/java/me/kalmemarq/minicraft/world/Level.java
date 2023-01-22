@@ -2,7 +2,7 @@ package me.kalmemarq.minicraft.world;
 
 import java.util.Random;
 
-import me.kalmemarq.minicraft.gfx.Renderer;
+import me.kalmemarq.minicraft.client.gfx.Renderer;
 import me.kalmemarq.minicraft.tile.Tile.TileState;
 import me.kalmemarq.minicraft.tile.Tiles;
 import me.kalmemarq.minicraft.util.NoiseGenerator;
