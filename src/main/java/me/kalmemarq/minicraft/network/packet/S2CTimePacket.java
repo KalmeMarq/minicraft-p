@@ -3,15 +3,15 @@ package me.kalmemarq.minicraft.network.packet;
 import me.kalmemarq.minicraft.network.Packet;
 import me.kalmemarq.minicraft.network.PacketByteBuf;
 
-public class PingPacket extends Packet {
+public class S2CTimePacket extends Packet {
     private long time;
 
-    public PingPacket() {}
+    public S2CTimePacket() {}
 
-    public PingPacket(long time) {
+    public S2CTimePacket(long time) {
         this.time = time;
     }
-
+    
     @Override
     public void read(PacketByteBuf buffer) throws Exception {
         this.time = buffer.readLong();
@@ -23,6 +23,6 @@ public class PingPacket extends Packet {
     }
 
     public long getTime() {
-        return time;
+      return time;
     }
 }

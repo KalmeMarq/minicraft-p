@@ -9,15 +9,15 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 public class PacketDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
-        short id = byteBuf.readUnsignedByte();
-        Class<? extends Packet> packetClass = Packet.PACKETS.get((int)id);
+        byte id = (byte)byteBuf.readUnsignedByte();
+        Class<? extends Packet> packetClass = Packet.PACKETS.get(id);
 
         if (packetClass == null) {
             throw new NullPointerException("Packet of id " + id + " is invalid. Could not found packet id.");
         }
 
         Packet packet = packetClass.getDeclaredConstructor().newInstance();
-        packet.read(byteBuf);
+        packet.read(new PacketByteBuf(byteBuf));
         out.add(packet);
     }
 }

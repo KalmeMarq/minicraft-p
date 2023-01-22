@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.Instant;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -19,8 +20,9 @@ import me.kalmemarq.minicraft.client.gfx.Renderer;
 import me.kalmemarq.minicraft.client.network.ClientNetworkHandler;
 import me.kalmemarq.minicraft.network.PacketDecoder;
 import me.kalmemarq.minicraft.network.PacketEncoder;
-import me.kalmemarq.minicraft.network.packet.ExitPacket;
-import me.kalmemarq.minicraft.network.packet.OutTimePacket;
+import me.kalmemarq.minicraft.network.packet.C2SExitPacket;
+import me.kalmemarq.minicraft.network.packet.C2STimePacket;
+import me.kalmemarq.minicraft.network.packet.MessagePacket;
 import me.kalmemarq.minicraft.network.packet.PingPacket;
 import me.kalmemarq.minicraft.util.OperatingSystem;
 import me.kalmemarq.minicraft.util.Util;
@@ -91,13 +93,17 @@ public class Main {
                     if (line.startsWith("ping")) {
                         channel.writeAndFlush(new PingPacket(System.nanoTime()), channel.voidPromise());
                     } else if (line.startsWith("time")) {
-                        channel.writeAndFlush(new OutTimePacket());
+                        channel.writeAndFlush(new C2STimePacket());
                     } else if (line.startsWith("exit")) {
-                        channel.writeAndFlush(new ExitPacket(), channel.voidPromise());
-                        // System.out.println("Waiting diconnect");
+                        channel.writeAndFlush(new C2SExitPacket(), channel.voidPromise());
+                        System.out.println("Waiting to diconnect");
                         channel.closeFuture().syncUninterruptibly();
-                        // System.out.println("Diconnected");
+                        System.out.println("Diconnected");
                         break;
+                    } else {
+                        Instant now = Instant.now();
+                        String text = line.trim();
+                        channel.writeAndFlush(new MessagePacket(text, now));
                     }
                 }
 

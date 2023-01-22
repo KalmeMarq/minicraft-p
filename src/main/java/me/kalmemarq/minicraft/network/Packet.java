@@ -3,22 +3,23 @@ package me.kalmemarq.minicraft.network;
 import java.util.Arrays;
 import java.util.List;
 
-import io.netty.buffer.ByteBuf;
-import me.kalmemarq.minicraft.network.packet.ExitPacket;
-import me.kalmemarq.minicraft.network.packet.InTimePacket;
-import me.kalmemarq.minicraft.network.packet.OutTimePacket;
+import me.kalmemarq.minicraft.network.packet.C2SExitPacket;
+import me.kalmemarq.minicraft.network.packet.MessagePacket;
+import me.kalmemarq.minicraft.network.packet.C2STimePacket;
 import me.kalmemarq.minicraft.network.packet.PingPacket;
+import me.kalmemarq.minicraft.network.packet.S2CTimePacket;
 
 public abstract class Packet {
     public static final List<Class<? extends Packet>> PACKETS = Arrays.asList(
         PingPacket.class,
-        InTimePacket.class,
-        OutTimePacket.class,
-        ExitPacket.class
+        C2STimePacket.class,
+        S2CTimePacket.class,
+        C2SExitPacket.class,
+        MessagePacket.class
     );
 
-    abstract public void read(ByteBuf byteBuf) throws Exception;
-    abstract public void write(ByteBuf byteBuf) throws Exception;
+    abstract public void read(PacketByteBuf buffer) throws Exception;
+    abstract public void write(PacketByteBuf buffer) throws Exception;
 
     static {
     }

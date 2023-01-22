@@ -14,6 +14,6 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
         }
 
         out.writeByte(id);
-        packet.write(out);
+        packet.write(new PacketByteBuf(out));
     }
 }
