@@ -4,14 +4,15 @@ import java.io.File;
 
 import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.gfx.Renderer;
-import me.kalmemarq.minicraft.main.optionparser.ArgOption;
-import me.kalmemarq.minicraft.main.optionparser.ArgOptionParser;
 import me.kalmemarq.minicraft.util.OperatingSystem;
+import me.kalmemarq.minicraft.util.Util;
+import me.kalmemarq.minicraft.util.optionparser.ArgOption;
+import me.kalmemarq.minicraft.util.optionparser.ArgOptionParser;
 
 public class Main {
     public static void main(String[] args) {
+        Util.Logging.setupCustomOutputs();
         ArgOptionParser optionParser = new ArgOptionParser();
-        
         ArgOption<Boolean> debug = optionParser.accepts("debug", Boolean.class);
         ArgOption<Boolean> fullscreen = optionParser.accepts("fullscreen", Boolean.class);
         ArgOption<Boolean> maximized = optionParser.accepts("maximized", Boolean.class);
@@ -43,7 +44,7 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            mc.close();
+            mc.stop();
         }
 
         System.exit(0);

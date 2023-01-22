@@ -23,6 +23,7 @@ import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.TextManager;
 import me.kalmemarq.minicraft.util.Util;
+import me.kalmemarq.minicraft.util.Util.Version;
 import me.kalmemarq.minicraft.util.Window;
 import me.kalmemarq.minicraft.util.language.Language;
 import me.kalmemarq.minicraft.util.resource.ReloadableResourceManager;
@@ -38,7 +39,10 @@ import me.kalmemarq.minicraft.util.sound.SoundManager;
 import me.kalmemarq.minicraft.world.World;
 
 public class Minicraft {
+    public static final Version VERSION = new Version("1.0.0");
     public static final Logger LOGGER = Util.Logging.getLogger();
+
+    public static boolean debug;
     
     public static final int TPS = 30;
     private static Minicraft INSTANCE;
@@ -58,23 +62,31 @@ public class Minicraft {
     
     @Nullable
     public World world;
+
+    public final Options options;
     
     public final ReloadableResourceManager resourceManager;
     private final ResourcePackManager resourcePackManager;
     public final VanillaResourcePack defautResourcePack;
     @Nullable
     private ResourceLoader resourceLoader;
+
+    public int currentFPS;
+    public int currentTicks;
     
     public Minicraft(RunArgs runArgs) {
         INSTANCE = this;
+        debug = runArgs.debug();
         this.resourcePackManager = new ResourcePackManager();
         this.defautResourcePack = new VanillaResourcePack();
         
+        this.options = new Options();
+
         this.window = new Window("Minicraft P", runArgs.width(), runArgs.height());
         
         this.window.setIcon(
-        this.defautResourcePack.open(new Identifier("icons/icon32.png")),
-        this.defautResourcePack.open(new Identifier("icons/icon64.png"))
+            this.defautResourcePack.open(new Identifier("icons/icon32.png")),
+            this.defautResourcePack.open(new Identifier("icons/icon64.png"))
         );
         
         this.keyboardHandler = new Keyboard(this);
@@ -101,9 +113,7 @@ public class Minicraft {
         long lastT = System.currentTimeMillis();
         long lastR = System.nanoTime();
         long lastTick = System.nanoTime();
-        
-        int currentFPS = 0;
-        int ticks = 0;
+
         int frameCounter = 0;
         int tickCounter = 0;
         double unprocessed = 0;
@@ -113,7 +123,9 @@ public class Minicraft {
         
         while (this.running) {
             long now = System.nanoTime();
-            
+            int maxFPS = this.window.getMaxFrameLimit();
+            double delta = (now - lastR) / 1.0E9;
+
             unprocessed += (now - lastTick) / NS_PER_TICK;
             lastTick = now;
             
@@ -123,10 +135,7 @@ public class Minicraft {
                 unprocessed--;
             }
             
-            
-            int maxFPS = this.window.getMaxFrameLimit();
-            double delta = (now - lastR) / 1.0E9;
-            if (maxFPS > 250 || delta >  (double)(0.9 /maxFPS)) {
+            if (maxFPS > 250 || delta > (0.9d / maxFPS)) {
                 this.update();
                 this.render();
                 ++frameCounter;
@@ -137,12 +146,12 @@ public class Minicraft {
                 this.queueQuit();
             }
             
-            if (System.currentTimeMillis() - lastT > 1000) {
+            if (System.currentTimeMillis() - lastT >= 1000L) {
                 lastT += 1000L;
                 currentFPS = frameCounter;
-                ticks = tickCounter;
+                currentTicks = tickCounter;
                 
-                System.out.printf("%d FPS %d TPS\n", currentFPS, ticks);
+                if (debug && !this.options.showDebugFPS) System.out.printf("%d FPS %d TPS", currentFPS, currentTicks);
                 
                 frameCounter = 0;
                 tickCounter = 0;
@@ -150,7 +159,7 @@ public class Minicraft {
         }
     }
     
-    public void close() {
+    public void stop() {
         try {
             this.soundManager.close();
             this.resourceManager.close();
@@ -188,6 +197,8 @@ public class Minicraft {
                 Renderer.renderPanel(Renderer.WIDTH / 2 - 68, Renderer.HEIGHT / 2 - 13, 136, 24);
                 this.font.renderCentered("Click to Focus!", Renderer.WIDTH / 2 + 1, Renderer.HEIGHT / 2 - 4, (System.currentTimeMillis() / 300) % 2 == 0 ? 0x8F8F8F : 0x9F9F9F);
             }
+
+            if (this.options.showDebugFPS) this.font.render(String.format("%d FPS", this.currentFPS), 0, 0);
         }
         
         this.window.renderFrame();
@@ -199,9 +210,9 @@ public class Minicraft {
         Renderer.fill(0);
         Renderer.renderTexturedQuad(TITLE_TEXTURE, Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 - 16, 120, 16);
         
-        Renderer.fillRect(Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 + 16, 120, 8, 0xFF_FF_FF_FF);
-        Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 1, Renderer.HEIGHT / 2 + 16 + 1, 120 - 2, 8 - 2, 0xFF_00_00_00);
-        Renderer.fillRect(Renderer.WIDTH / 2 - 60 + 2, Renderer.HEIGHT / 2 + 16 + 2, (int)(120 * resourceLoader.getProgress()) - 4, 8 - 4, 0xFF_FF_FF_FF);
+        Renderer.renderColoredQuad(Renderer.WIDTH / 2 - 60, Renderer.HEIGHT / 2 + 16, 120, 8, 0xFF_FF_FF_FF);
+        Renderer.renderColoredQuad(Renderer.WIDTH / 2 - 60 + 1, Renderer.HEIGHT / 2 + 16 + 1, 120 - 2, 8 - 2, 0xFF_00_00_00);
+        Renderer.renderColoredQuad(Renderer.WIDTH / 2 - 60 + 2, Renderer.HEIGHT / 2 + 16 + 2, (int)(120 * resourceLoader.getProgress()) - 4, 8 - 4, 0xFF_FF_FF_FF);
         
         if (this.resourceLoader.isCompleted()) {
             this.resourceLoader = null;

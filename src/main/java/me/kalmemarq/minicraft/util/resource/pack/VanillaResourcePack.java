@@ -28,9 +28,11 @@ import me.kalmemarq.minicraft.util.Identifier;
 
 public class VanillaResourcePack extends ResourcePack {
     private final Path root;
+    private final Set<String> namespaces;
     
     public VanillaResourcePack() {
         super("vanilla");
+        this.namespaces = ImmutableSet.of("minicraft");
         this.root = this.getRoot();
 
         if (this.root == null) {
@@ -104,7 +106,7 @@ public class VanillaResourcePack extends ResourcePack {
 
     @Override
     public Set<String> getNamespaces() {
-        return ImmutableSet.of("minicraft");
+        return this.namespaces;
     }
 
     @Override

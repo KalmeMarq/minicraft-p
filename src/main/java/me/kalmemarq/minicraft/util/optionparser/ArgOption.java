@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.main.optionparser;
+package me.kalmemarq.minicraft.util.optionparser;
 
 import java.util.ArrayList;
 import java.util.List;

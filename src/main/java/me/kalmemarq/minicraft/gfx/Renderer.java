@@ -33,7 +33,7 @@ public class Renderer {
 
     public static void loadTitleTexture() {
         images.put("title.png", new MinicraftImage("/assets/minicraft/textures/title.png"));
-        textures.put(new Identifier("textures/title.png"), new MinicraftImage("/title.png"));
+        textures.put(new Identifier("textures/title.png"), new MinicraftImage("/assets/minicraft/textures/title.png"));
     }
 
     public static void reset() {

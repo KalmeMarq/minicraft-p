@@ -42,15 +42,21 @@ public class Keyboard {
         if (action == 1) {
             if (Keybinding.FULLSCREEN.test(code)) {
                 mc.getWindow().toggleFullscreen();
+                return;
             }
 
             if (code == Keys.KEY_F5) {
                 this.mc.reloadResources(isKeyPressed(Keys.KEY_SHIFT));
+                return;
             }
 
             if (code == Keys.KEY_ESCAPE && this.mc.menu == null) {
                 this.mc.setMenu(new PauseMenu());
                 return;
+            }
+
+            if (code == Keys.KEY_F4) {
+                this.mc.options.showDebugFPS = !this.mc.options.showDebugFPS;
             }
         }
 

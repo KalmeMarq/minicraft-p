@@ -195,6 +195,7 @@ public class Window {
     }
 
     public void close() {
+        this.frame.dispose();
         this.frame.dispatchEvent(new WindowEvent(this.frame, WindowEvent.WINDOW_CLOSING));
     }
 
