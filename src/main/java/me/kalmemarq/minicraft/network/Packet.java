@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import me.kalmemarq.minicraft.network.packet.C2SExitPacket;
-import me.kalmemarq.minicraft.network.packet.MessagePacket;
 import me.kalmemarq.minicraft.network.packet.C2STimePacket;
+import me.kalmemarq.minicraft.network.packet.MessagePacket;
 import me.kalmemarq.minicraft.network.packet.PingPacket;
 import me.kalmemarq.minicraft.network.packet.S2CTimePacket;
 
@@ -20,6 +20,8 @@ public abstract class Packet {
 
     abstract public void read(PacketByteBuf buffer) throws Exception;
     abstract public void write(PacketByteBuf buffer) throws Exception;
+
+    abstract public void handle(PacketListener listener);
 
     static {
     }

@@ -1,10 +1,11 @@
-package me.kalmemarq.minicraft.util;
+package me.kalmemarq.minicraft.client.util;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import me.kalmemarq.minicraft.Minicraft;
+import me.kalmemarq.minicraft.client.Minicraft;
 import me.kalmemarq.minicraft.client.gui.PauseMenu;
+import me.kalmemarq.minicraft.util.Keys;
 
 public class Keyboard {
     private final Minicraft mc;
@@ -56,7 +57,7 @@ public class Keyboard {
             }
 
             if (code == Keys.KEY_F4) {
-                this.mc.options.showDebugFPS = !this.mc.options.showDebugFPS;
+                this.mc.options.showDebugFPS.opposite();
             }
         }
 

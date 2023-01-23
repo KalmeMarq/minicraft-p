@@ -1,6 +1,6 @@
 package me.kalmemarq.minicraft.item;
 
-import me.kalmemarq.minicraft.Minicraft;
+import me.kalmemarq.minicraft.client.Minicraft;
 
 public class ItemStack {
     public static final ItemStack EMPTY = new ItemStack(null);

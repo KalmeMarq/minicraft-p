@@ -21,6 +21,8 @@ public class TitleMenu extends Menu {
             this.mc.setMenu(new PlayMenu(this));
         }), 20, 0);
 
+        addEntry(new SelectEntry("Multiplayer", () -> {})).setEnabled(false);;
+
         addEntry(new SelectEntry("minicraft.menu.options", () -> {
             this.mc.setMenu(new OptionsMenu(this));
         }));

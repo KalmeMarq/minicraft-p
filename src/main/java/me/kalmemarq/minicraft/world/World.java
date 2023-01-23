@@ -1,7 +1,7 @@
 package me.kalmemarq.minicraft.world;
 
 import me.kalmemarq.minicraft.client.gfx.Renderer;
-import me.kalmemarq.minicraft.util.Keybinding;
+import me.kalmemarq.minicraft.client.util.Keybinding;
 
 public class World {
     private final Level[] levels = new Level[LevelDepth.values().length];

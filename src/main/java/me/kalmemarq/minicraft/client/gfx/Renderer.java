@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 
 import org.jetbrains.annotations.Nullable;
 
-import me.kalmemarq.minicraft.Minicraft;
+import me.kalmemarq.minicraft.client.Minicraft;
 import me.kalmemarq.minicraft.util.Identifier;
 import me.kalmemarq.minicraft.util.math.AABB;
 import me.kalmemarq.minicraft.util.math.MathHelper;

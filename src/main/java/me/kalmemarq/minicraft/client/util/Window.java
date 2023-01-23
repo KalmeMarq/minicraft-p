@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft.util;
+package me.kalmemarq.minicraft.client.util;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -32,8 +32,9 @@ import javax.swing.WindowConstants;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import me.kalmemarq.minicraft.Minicraft;
+import me.kalmemarq.minicraft.client.Minicraft;
 import me.kalmemarq.minicraft.client.gfx.Renderer;
+import me.kalmemarq.minicraft.util.Util;
 
 public class Window {
     private static final Logger LOGGER = Util.Logging.getLogger();

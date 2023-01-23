@@ -20,6 +20,8 @@ public class ServerNetworkHandler extends SimpleChannelInboundHandler<Packet> {
     
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Packet packet) throws Exception {
+        if (!this.channel.isOpen()) return;
+
         if (packet instanceof PingPacket) {
             this.channel.writeAndFlush(packet, this.channel.voidPromise());
         } else if (packet instanceof C2STimePacket) {

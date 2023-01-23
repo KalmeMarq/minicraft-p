@@ -6,7 +6,9 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.lang.StackWalker.Option;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
@@ -20,7 +22,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import me.kalmemarq.minicraft.Minicraft;
+import me.kalmemarq.minicraft.client.Minicraft;
 
 public final class Util {
     private Util() {}
@@ -62,10 +64,113 @@ public final class Util {
     public static final class Json {
         private Json() {}
 
-        private static final ObjectMapper objectMapper = new ObjectMapper().configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        private static final ObjectMapper objectMapper = getDefaultMapper();
+        private static final int INDENT = 2;
         
+        public static ObjectMapper getDefaultMapper() {
+            if (objectMapper == null) {
+                return new ObjectMapper()
+                    .configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+            }
+
+            return objectMapper;
+        }
+
         public static JsonNode parse(Reader reader) throws IOException {
             return objectMapper.readTree(reader);
+        }
+
+        private static void stringify(StringBuilder builder, JsonNode node, int level) {
+            if (node.isShort() || node.isInt()) {
+                builder.append(node.asInt());
+                return;
+            }
+
+            if (node.isLong()) {
+                builder.append(node.asLong());
+                return;
+            }
+
+            if (node.isFloat() || node.isDouble()) {
+                builder.append(node.asDouble());
+                return;
+            }
+
+            if (node.isTextual()) {
+                builder.append('"').append(node.asText()).append('"');
+                return;
+            }
+
+            if (node.isObject()) {
+                builder.append("{\n");
+
+                for (Iterator<Entry<String, JsonNode>> iter = node.fields(); iter.hasNext(); ) {
+                    Entry<String, JsonNode> entry = iter.next();
+
+                    builder.append(" ".repeat((level + 1) * INDENT));
+                    builder.append('"').append(entry.getKey()).append('"').append(": ");
+                    stringify(builder, entry.getValue(), level + 1);
+                    
+                    if (iter.hasNext()) {
+                        builder.append(",\n");
+                    }
+                }
+
+                builder.append("\n").append(" ".repeat(level * INDENT)).append("}");
+                return;
+            }
+
+            if (node.isArray()) {
+                Iterator<JsonNode> iter0 = node.elements();
+                boolean isAllPrimitive = true;
+
+                while (iter0.hasNext()) {
+                    JsonNode entry = iter0.next();
+
+                    if (entry.isObject() || entry.isArray()) {
+                        isAllPrimitive = false;
+                        break;
+                    }
+                }
+
+                builder.append("[");
+                if (!isAllPrimitive) {
+                    builder.append('\n');
+                }
+
+                for (Iterator<JsonNode> iter = node.elements(); iter.hasNext(); ) {
+                    if (!isAllPrimitive) {
+                        builder.append(" ".repeat((level + 1) * INDENT));
+                    }
+
+                    stringify(builder, node, level + 1);
+                    
+                    if (iter.hasNext()) {
+                        if (isAllPrimitive) {
+                            builder.append(", ");
+                        } else builder.append(",\n");
+                    }
+                }
+
+                if (isAllPrimitive) {
+                    builder.append("]");
+                } else {
+                    builder.append("\n").append(" ".repeat(level * INDENT)).append("]");
+                }
+            }
+            
+            if (node.isBoolean()) {
+                builder.append(node.asBoolean());
+                return;
+            }
+        }
+
+        public static String stringify(JsonNode node) {
+            StringBuilder builder = new StringBuilder();
+
+            stringify(builder, node, 0);
+
+            return builder.toString();
         }
 
         public static boolean hasString(JsonNode node, String key) {

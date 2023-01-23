@@ -1,4 +1,4 @@
-package me.kalmemarq.minicraft;
+package me.kalmemarq.minicraft.client;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,18 +13,17 @@ import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import me.kalmemarq.minicraft.client.ClientRunArgs;
 import me.kalmemarq.minicraft.client.gfx.Font;
 import me.kalmemarq.minicraft.client.gfx.MinicraftImage;
 import me.kalmemarq.minicraft.client.gfx.Renderer;
 import me.kalmemarq.minicraft.client.gui.Menu;
 import me.kalmemarq.minicraft.client.gui.TitleMenu;
+import me.kalmemarq.minicraft.client.util.Keyboard;
+import me.kalmemarq.minicraft.client.util.Window;
 import me.kalmemarq.minicraft.util.Identifier;
-import me.kalmemarq.minicraft.util.Keyboard;
 import me.kalmemarq.minicraft.util.TextManager;
 import me.kalmemarq.minicraft.util.Util;
 import me.kalmemarq.minicraft.util.Util.Version;
-import me.kalmemarq.minicraft.util.Window;
 import me.kalmemarq.minicraft.util.language.Language;
 import me.kalmemarq.minicraft.util.resource.ReloadableResourceManager;
 import me.kalmemarq.minicraft.util.resource.Resource;
@@ -77,10 +76,18 @@ public class Minicraft {
     public Minicraft(ClientRunArgs runArgs) {
         INSTANCE = this;
         debug = runArgs.debug();
+        
+        if (!runArgs.gameDir().exists()) {
+            if (!runArgs.gameDir().mkdir()) {
+                throw new RuntimeException("Unable to create game directory");
+            }
+        }
+
         this.resourcePackManager = new ResourcePackManager();
         this.defautResourcePack = new VanillaResourcePack();
         
-        this.options = new Options();
+        this.options = new Options(runArgs.gameDir());
+        this.options.load();
 
         this.window = new Window("Minicraft P", runArgs.width(), runArgs.height());
         
@@ -119,7 +126,7 @@ public class Minicraft {
         double unprocessed = 0;
         double NS_PER_TICK = 1E9D / TPS;
         
-        this.window.setMaxFrameLimit(300);
+        this.window.setMaxFrameLimit(this.options.fps.value());
         
         while (this.running) {
             long now = System.nanoTime();
@@ -151,7 +158,7 @@ public class Minicraft {
                 currentFPS = frameCounter;
                 currentTicks = tickCounter;
                 
-                if (debug && !this.options.showDebugFPS) System.out.printf("%d FPS %d TPS\n", currentFPS, currentTicks);
+                if (debug && !this.options.showDebugFPS.value()) System.out.printf("%d FPS %d TPS\n", currentFPS, currentTicks);
                 
                 frameCounter = 0;
                 tickCounter = 0;
@@ -198,7 +205,7 @@ public class Minicraft {
                 this.font.renderCentered("Click to Focus!", Renderer.WIDTH / 2 + 1, Renderer.HEIGHT / 2 - 4, (System.currentTimeMillis() / 300) % 2 == 0 ? 0x8F8F8F : 0x9F9F9F);
             }
 
-            if (this.options.showDebugFPS) this.font.render(String.format("%d FPS", this.currentFPS), 0, 0);
+            if (this.options.showDebugFPS.value()) this.font.render(String.format("%d FPS", this.currentFPS), 0, 0);
         }
         
         this.window.renderFrame();

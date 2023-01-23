@@ -1,4 +1,6 @@
-package me.kalmemarq.minicraft.util;
+package me.kalmemarq.minicraft.client.util;
+
+import me.kalmemarq.minicraft.util.Keys;
 
 public class Keybinding {
     public static final Keybinding MOVE_UP = new Keybinding(Keys.KEY_W, Keys.KEY_ARROW_UP);

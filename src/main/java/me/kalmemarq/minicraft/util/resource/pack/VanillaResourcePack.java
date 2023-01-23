@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.ImmutableSet;
 
-import me.kalmemarq.minicraft.Minicraft;
+import me.kalmemarq.minicraft.client.Minicraft;
 import me.kalmemarq.minicraft.util.Identifier;
 
 public class VanillaResourcePack extends ResourcePack {

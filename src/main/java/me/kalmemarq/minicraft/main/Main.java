@@ -2,8 +2,8 @@ package me.kalmemarq.minicraft.main;
 
 import java.io.File;
 
-import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.client.ClientRunArgs;
+import me.kalmemarq.minicraft.client.Minicraft;
 import me.kalmemarq.minicraft.client.gfx.Renderer;
 import me.kalmemarq.minicraft.util.OperatingSystem;
 import me.kalmemarq.minicraft.util.Util;

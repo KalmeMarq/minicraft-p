@@ -15,9 +15,9 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import me.kalmemarq.minicraft.Minicraft;
 import me.kalmemarq.minicraft.client.gfx.Renderer;
-import me.kalmemarq.minicraft.client.network.ClientNetworkHandler;
+import me.kalmemarq.minicraft.client.network.NetworkClientHandler;
+import me.kalmemarq.minicraft.network.MinicraftConnection;
 import me.kalmemarq.minicraft.network.PacketDecoder;
 import me.kalmemarq.minicraft.network.PacketEncoder;
 import me.kalmemarq.minicraft.network.packet.C2SExitPacket;
@@ -71,13 +71,17 @@ public class Main {
             EventLoopGroup eventLoopGroup = EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
             try {
+                MinicraftConnection connection = new MinicraftConnection();
+                NetworkClientHandler handler = new NetworkClientHandler(connection);
+                connection.setListener(handler);
+
                 Channel channel = new Bootstrap()
                     .group(eventLoopGroup)
                     .channel(EPOLL ? EpollSocketChannel.class : NioSocketChannel.class)
                     .handler(new ChannelInitializer<Channel>() {
                         @Override
                         protected void initChannel(Channel channel) throws Exception {
-                            channel.pipeline().addLast(new PacketDecoder()).addLast(new PacketEncoder()).addLast(new ClientNetworkHandler());
+                            channel.pipeline().addLast(new PacketDecoder()).addLast(new PacketEncoder()).addLast(connection);
                         }
                     })
                     .connect(runArgs.serverIp(), runArgs.serverPort()).sync().channel();
@@ -91,11 +95,11 @@ public class Main {
                     }
                  
                     if (line.startsWith("ping")) {
-                        channel.writeAndFlush(new PingPacket(System.nanoTime()), channel.voidPromise());
+                        connection.sendPacket(new PingPacket(System.nanoTime()));
                     } else if (line.startsWith("time")) {
-                        channel.writeAndFlush(new C2STimePacket());
+                        connection.sendPacket(new C2STimePacket());
                     } else if (line.startsWith("exit")) {
-                        channel.writeAndFlush(new C2SExitPacket(), channel.voidPromise());
+                        connection.sendPacket(new C2SExitPacket());
                         System.out.println("Waiting to diconnect");
                         channel.closeFuture().syncUninterruptibly();
                         System.out.println("Diconnected");
@@ -103,7 +107,7 @@ public class Main {
                     } else {
                         Instant now = Instant.now();
                         String text = line.trim();
-                        channel.writeAndFlush(new MessagePacket(text, now));
+                        connection.sendPacket(new MessagePacket(text, now));
                     }
                 }
 

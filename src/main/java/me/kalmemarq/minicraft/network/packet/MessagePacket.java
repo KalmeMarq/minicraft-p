@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import me.kalmemarq.minicraft.network.Packet;
 import me.kalmemarq.minicraft.network.PacketByteBuf;
+import me.kalmemarq.minicraft.network.PacketListener;
 
 public class MessagePacket extends Packet {
     private String text;
@@ -26,6 +27,11 @@ public class MessagePacket extends Packet {
     public void write(PacketByteBuf buffer) throws Exception {
         buffer.writeString(this.text);
         buffer.writeInstant(this.time);
+    }
+
+    @Override
+    public void handle(PacketListener listener) {
+        listener.onMessage(this);
     }
 
     public String getText() {

@@ -1,8 +1,8 @@
 package me.kalmemarq.minicraft.client.gui;
 
-import me.kalmemarq.minicraft.Minicraft;
+import me.kalmemarq.minicraft.client.Minicraft;
 import me.kalmemarq.minicraft.client.gfx.Font;
-import me.kalmemarq.minicraft.util.Keybinding;
+import me.kalmemarq.minicraft.client.util.Keybinding;
 import me.kalmemarq.minicraft.util.language.Language;
 import me.kalmemarq.minicraft.util.sound.SoundEvents;
 

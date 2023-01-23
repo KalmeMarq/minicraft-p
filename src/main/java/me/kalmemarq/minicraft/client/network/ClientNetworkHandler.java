@@ -21,6 +21,8 @@ public class ClientNetworkHandler extends SimpleChannelInboundHandler<Packet> {
     
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Packet packet) throws Exception {
+        if (!this.channel.isOpen()) return;
+
         if (packet instanceof PingPacket pingPacket) {
             System.out.println("Your ping is: " + (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - pingPacket.getTime())) + "ms");
         } else if (packet instanceof S2CTimePacket timePacket) {

@@ -10,3 +10,5 @@ datapack/
       entities/*.json
       items/*.json
       tiles/*.json
+
+Support wav, ogg and mp3
