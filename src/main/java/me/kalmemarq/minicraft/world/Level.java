@@ -1,8 +1,11 @@
 package me.kalmemarq.minicraft.world;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import me.kalmemarq.minicraft.client.gfx.Renderer;
+import me.kalmemarq.minicraft.entity.Entity;
 import me.kalmemarq.minicraft.tile.Tile.TileState;
 import me.kalmemarq.minicraft.tile.Tiles;
 import me.kalmemarq.minicraft.util.NoiseGenerator;
@@ -17,6 +20,9 @@ public class Level {
     private final int height;
 
     private final TileState[] tiles;
+
+    private final List<Entity> entities = new ArrayList<>();
+    private final List<Entity> entitiesAddQueue = new ArrayList<>(); 
 
     public Level(World world, int width, int height) {
         this.world = world;
@@ -60,16 +66,35 @@ public class Level {
     }
 
     public TileState getTileState(int x, int y) {
+        if (y * width + x > this.tiles.length || y * width + x < 0) return Tiles.AIR.getDefaultState();
         TileState state = this.tiles[y * width + x];
-        return state == null ? new TileState(Tiles.AIR) : state;
+        return state == null ? Tiles.AIR.getDefaultState() : state;
     }
 
     public boolean inBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < this.width && y < this.height;
     }
 
+    public void tick() {
+        for (Entity e : this.entitiesAddQueue) {
+            this.entities.add(e);
+        }
+
+        this.entitiesAddQueue.clear();
+
+        for (Entity e : this.entities) {
+            e.tick();
+        }
+    }
+
+    public void update() {}
+
     // TODO: Optimize this shit
     public void render() {
+        Renderer.pushCamera();
+
+        world.playerEntity.updateCamera();
+
         AABB frustum = Renderer.getAABB();
 
         int tx0 = Level.toTile(frustum.minX()) - 1;
@@ -84,6 +109,24 @@ public class Level {
                 this.tiles[y * this.width + x].getTile().render(this.world, this, x, y);
             }
         }
+
+        for (Entity e : this.entities) {
+            e.render();
+        }
+
+        Renderer.popCamera();
+    }
+
+    public void addEntity(Entity e) {
+        entitiesAddQueue.add(e);
+    }
+
+    public int getWidth() {
+      return width;
+    }
+
+    public int getHeight() {
+      return height;
     }
 
     public static int toTile(int pixel) {

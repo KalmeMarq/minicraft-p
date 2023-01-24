@@ -10,8 +10,13 @@ public class FlowerTile extends Tile {
     }
 
     @Override
+    public boolean connectsToGrass() {
+        return true;
+    }
+
+    @Override
     public void render(World world, Level level, int x, int y) {
-        Renderer.render("tiles.png", x * 16, y * 16, 24, 48, 16, 16);
+        Tiles.GRASS.render(world, level, x, y);
         Renderer.render("tiles.png", x * 16, y * 16, 24, 48 + 16, 8, 8);
     }
 }

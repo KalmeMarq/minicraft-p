@@ -28,4 +28,9 @@ public class AABB {
     public int maxY() {
         return this.maxY;
     }
+
+    @Override
+    public String toString() {
+        return String.format("AABB[minX=%d,minY=%d,maxX=%d,maxY=%d]", this.minX, this.minY, this.maxX, this.maxY);
+    }
 }

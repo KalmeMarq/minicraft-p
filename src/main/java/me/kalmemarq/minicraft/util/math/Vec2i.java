@@ -19,11 +19,21 @@ public class Vec2i {
         this.y = y;
     }
 
+    public void add(Vec2i vec) {
+        this.x += vec.x;
+        this.y += vec.y;
+    }
+
     public int getX() {
         return x;
     }
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public String toString() {
+        return "Vec2i[x=" + this.x + ",y=" + this.y + "]";
     }
 }

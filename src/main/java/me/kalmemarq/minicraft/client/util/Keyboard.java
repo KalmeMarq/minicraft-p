@@ -10,7 +10,7 @@ import me.kalmemarq.minicraft.util.Keys;
 public class Keyboard {
     private final Minicraft mc;
     private final KeyListener listener;
-    private final static int[] keys = new int[65556];
+    protected final static int[] keys = new int[65556];
 
     public Keyboard(Minicraft mc) {
         this.mc = mc;
@@ -63,12 +63,6 @@ public class Keyboard {
 
         if (action == 1 && this.mc.menu != null) {
             this.mc.menu.keyPressed(code);
-        }
-
-        if (this.mc.world != null) {
-            Keybinding.setKeyPressed(code, action == 1);
-            
-            this.mc.world.wtf(code, action);
         }
     }
     

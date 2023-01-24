@@ -26,4 +26,9 @@ public class Camera {
     public void setTy(int y) {
         ty = y;
     }
+
+    @Override
+    public String toString() {
+        return "Camera[tx=" + this.tx + ",ty=" + this.ty + "]";
+    }
 }

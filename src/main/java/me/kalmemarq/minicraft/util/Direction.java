@@ -18,4 +18,12 @@ public enum Direction {
 
         return y < 0 ? NORTH : SOUTH;
     }
+
+    public static Direction get(double x, double y) {
+        if (Math.abs(x) >= Math.abs(y)) {
+            return x < 0 ? WEST : EAST;
+        }
+
+        return y < 0 ? NORTH : SOUTH;
+    }
 }

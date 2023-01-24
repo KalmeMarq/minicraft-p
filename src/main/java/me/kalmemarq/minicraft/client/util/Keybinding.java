@@ -61,6 +61,16 @@ public class Keybinding {
         }
     }
 
+    public boolean down() {
+        for (int key : codes) {
+            if (Keyboard.isKeyPressed(key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void setPressed(boolean pressed) {
         wasPressed = pressed;
     }

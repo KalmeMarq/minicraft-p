@@ -43,7 +43,7 @@ public class Minicraft {
 
     public static boolean debug;
     
-    public static final int TPS = 30;
+    public static final int TPS = 60;
     private static Minicraft INSTANCE;
     
     private final Window window;
@@ -187,6 +187,13 @@ public class Minicraft {
         } else {
             if (this.world != null) {
                 this.world.render();
+
+                if (this.options.showDebugFPS.value() && this.world.playerEntity != null) {
+                    this.font.render(this.world.getCurrentDepth().getName(), 1, 10);
+                    this.font.render(String.format("Pos: %.4f/%.4f", this.world.playerEntity.getX(), this.world.playerEntity.getY()), 1, 19);
+                    this.font.render(String.format("Health: ", this.world.playerEntity.getHealth()), 1, 28);
+                    this.font.render(String.format("Stamina: ", this.world.playerEntity.getStamina()), 1, 37);    
+                }
                 
                 Renderer.enableBlend();
                 Renderer.defaultBlendFunc();
@@ -205,7 +212,7 @@ public class Minicraft {
                 this.font.renderCentered("Click to Focus!", Renderer.WIDTH / 2 + 1, Renderer.HEIGHT / 2 - 4, (System.currentTimeMillis() / 300) % 2 == 0 ? 0x8F8F8F : 0x9F9F9F);
             }
 
-            if (this.options.showDebugFPS.value()) this.font.render(String.format("%d FPS", this.currentFPS), 0, 0);
+            if (this.options.showDebugFPS.value()) this.font.render(String.format("%d FPS", this.currentFPS), 1, 1);
         }
         
         this.window.renderFrame();

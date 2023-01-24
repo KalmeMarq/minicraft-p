@@ -17,6 +17,10 @@ public class Tile {
         this.health = health;
     }
 
+    public boolean connectsToGrass() {
+        return false;
+    }
+
     public TileState getDefaultState() {
         return new TileState(this);
     }
