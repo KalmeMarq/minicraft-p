@@ -12,3 +12,34 @@ datapack/
       tiles/*.json
 
 Support wav, ogg and mp3
+
+World/
+  level0.bso
+  level1.bso
+  level2.bso
+  level3.bso
+  level4.bso
+    {
+      width: int
+      height: int
+      tiles: TileState[]
+      entities: []
+    }
+  world.bso
+    {
+      currentDepth: byte
+      spawnX: double
+      spawnY: double
+      time: long
+      timeOfDay: long
+      player: {
+        health: int
+        stamina: int
+        pos: double[]
+        prevPos: double[]
+        direction: byte
+        prevDirection: byte
+        moving: byte
+        swimming: byte
+      }
+    }

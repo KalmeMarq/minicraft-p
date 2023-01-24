@@ -14,6 +14,7 @@ public class PlayMenu extends Menu {
     }
 
     private SelectEntry createWorldEntry;
+    private String worldName;
 
     @Override
     protected void init() {
@@ -34,7 +35,7 @@ public class PlayMenu extends Menu {
         addEntry(new CycleEntry<>("minicraft.menu.world_size", Arrays.asList(WorldSize.values()), WorldSize.SMALL, v -> v.getName(), v -> {}));
 
         createWorldEntry = new SelectEntry("minicraft.menu.create_world", () -> {
-            this.mc.world = new World(new WorldProperties(0, 0));
+            this.mc.world = new World(this.worldName, new WorldProperties(0, 0));
 
             this.mc.setMenu(null);
         });

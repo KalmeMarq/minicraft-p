@@ -1,5 +1,6 @@
 package me.kalmemarq.minicraft.entity;
 
+import me.kalmemarq.bso.BSOMap;
 import me.kalmemarq.minicraft.world.Level;
 import me.kalmemarq.minicraft.world.World;
 
@@ -23,4 +24,12 @@ public abstract class LivingEntity extends Entity {
 
     abstract public int getMaxHealth();
     abstract public int getMaxStamina();
+
+    @Override
+    protected void writeCustomBSO(BSOMap map) {
+        super.writeCustomBSO(map);
+
+        map.put("health", this.health);
+        map.put("stamina", this.stamina);
+    }
 }

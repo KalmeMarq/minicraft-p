@@ -1,5 +1,7 @@
 package me.kalmemarq.minicraft.entity;
 
+import me.kalmemarq.bso.BSODoubleArray;
+import me.kalmemarq.bso.BSOMap;
 import me.kalmemarq.minicraft.util.CollisionBox;
 import me.kalmemarq.minicraft.util.Direction;
 import me.kalmemarq.minicraft.util.math.Vec2d;
@@ -75,4 +77,18 @@ public abstract class Entity {
 
     public void moveToLevel(Level level) {
     }
+
+    public BSOMap writeBSO() {
+        BSOMap map = new BSOMap();
+        map.put("pos", BSODoubleArray.of(new double[]{ this.pos.getX(), this.pos.getY() }));
+        map.put("prevPos", BSODoubleArray.of(new double[]{ this.prevPos.getX(), this.prevPos.getY() }));
+        map.put("direction", this.direction.ordinal());
+        map.put("prevDirection", this.prevDirection.ordinal());
+        map.put("swimming", this.swimming);
+        map.put("moving", this.moving);
+        this.writeCustomBSO(map);
+        return map;
+    }
+
+    protected void writeCustomBSO(BSOMap map) {}
 }

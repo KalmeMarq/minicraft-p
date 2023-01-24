@@ -23,4 +23,14 @@ public enum LevelDepth {
     public String getName() {
         return name;
     }
+
+    public static LevelDepth byId(int id) {
+        for (LevelDepth depth : LevelDepth.values()) {
+            if (id == depth.id) {
+                return depth;
+            }
+        }
+
+        return null;
+    }
 }

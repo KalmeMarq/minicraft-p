@@ -15,17 +15,19 @@ public class Level {
     private final Random random = new Random();
 
     private final World world;
+    private final LevelDepth depth;
 
     private final int width;
     private final int height;
 
     private final TileState[] tiles;
 
-    private final List<Entity> entities = new ArrayList<>();
+    protected final List<Entity> entities = new ArrayList<>();
     private final List<Entity> entitiesAddQueue = new ArrayList<>(); 
 
-    public Level(World world, int width, int height) {
+    public Level(World world, LevelDepth depth, int width, int height) {
         this.world = world;
+        this.depth = depth;
 
         this.tiles = new TileState[width * height];
 

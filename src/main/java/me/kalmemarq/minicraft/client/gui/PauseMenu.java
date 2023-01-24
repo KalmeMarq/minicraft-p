@@ -18,6 +18,7 @@ public class PauseMenu extends Menu {
         }));
 
         addEntry(new SelectEntry("minicraft.menu.return_to_title", () -> {
+            this.mc.world.saveWorld();
             this.mc.world = null;
             this.mc.setMenu(new TitleMenu());
         }));
